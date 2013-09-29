@@ -18,7 +18,7 @@ bleachUri = (vol, ep, folderName, pageNum = "01", doublePage = false) ->
 
 bleachUri2 = (vol, ep, folderName, pageNum = "01", doublePage = false) ->
   pageNum = "#{pageNum}_#{pageNum + 1}" if doublePage
-  "http://z.mfcdn.net/store/manga/9/#{vol}-#{ep}.0/compressed/page#{pageNum}.jpg"
+  "http://z.mfcdn.net/store/manga/9/#{vol}-#{ep}.0/compressed/#{folderName}#{pageNum}.jpg"
 
 downloadImage = (uriFunc, vol, ep, folderName, pageNum, fileName) ->
   async.timesSeries 2, (n, next) ->
@@ -35,16 +35,17 @@ downloadImage = (uriFunc, vol, ep, folderName, pageNum, fileName) ->
   , (err) -> console.log err
 
 downloadEpPerform = (uriFunc, vol, ep, folderName) ->
+  unless fs.existsSync("manga/bleach/#{vol}-#{ep}")
+    fs.mkdirSync("manga/bleach/#{vol}-#{ep}")
+
   console.log uriFunc(vol, ep, folderName)
+
   for i in [0..30]
     do (i) ->
       i = "0#{i}" if i < 10
       downloadImage(uriFunc, vol, ep, folderName, i, "#{i}.jpg")
 
 downloadEp = (vol, ep) ->
-  unless fs.existsSync("manga/bleach/#{vol}-#{ep}")
-    fs.mkdirSync("manga/bleach/#{vol}-#{ep}")
-
   async.parallel [
     (callback) ->
       request.head bleachUri(vol, ep, 'M7_Bleach_Ch'), (err, res, body) ->
@@ -62,10 +63,20 @@ downloadEp = (vol, ep) ->
           downloadEpPerform(bleachUri, vol, ep, 'm7_bleach_ch')
           callback 'c'
     (callback) ->
-      request.head bleachUri2(vol, ep, ''), (err, res, body) ->
+      request.head bleachUri2(vol, ep, 'page'), (err, res, body) ->
         if res.headers['content-type'] is 'image/jpeg'
           downloadEpPerform(bleachUri2, vol, ep, 'm7_bleach_ch')
           callback 'd'
+    (callback) ->
+      request.head bleachUri(vol, ep, 'Bleach_'), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, vol, ep, 'Bleach_')
+          callback 'e'
+    (callback) ->
+      request.head bleachUri2(vol, ep, ''), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri2, vol, ep, '')
+          callback 'f'
   ],
   (err) -> console.log "Using option #{err[0]}\n"
 
