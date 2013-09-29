@@ -3,6 +3,7 @@
 fs = require('fs')
 request = require('request')
 program = require('commander')
+async = require('async')
 
 program
   .version('0.0.1')
@@ -16,19 +17,18 @@ bleachUri = (vol, ep, folderName, pageNum = "01", doublePage = false) ->
   "http://z.mfcdn.net/store/manga/9/#{vol}-#{ep}.0/compressed/#{folderName}#{ep}_#{pageNum}.jpg"
 
 downloadImage = (vol, ep, folderName, pageNum, fileName) ->
-  uri = bleachUri(vol, ep, folderName, pageNum)
-  request.head uri, (err, res, body) ->
-    if res.headers['content-type'] is 'image/jpeg'
-      console.log "Downloaded: #{fileName}"
-      request(uri: uri, timeout: 120 * 1000).pipe(fs.createWriteStream("#{ep}/#{fileName}"))
-    else
-      uri = bleachUri(vol, ep, folderName, pageNum, true)
-      request.head uri, (err, res, body) ->
-        if res.headers['content-type'] is 'image/jpeg'
-          console.log "Downloaded: #{fileName} (Dual)"
-          request(uri: uri, timeout: 120 * 1000).pipe(fs.createWriteStream("#{ep}/#{fileName}"))
-        else
-          console.log "Not found: #{fileName}"
+  async.timesSeries 2, (n, next) ->
+    uri = bleachUri(vol, ep, folderName, pageNum, n)  # if n is 1, would perform for a dual page
+    request.head uri, (err, res, body) ->
+      if res.headers['content-type'] is 'image/jpeg'
+        request(uri: uri, timeout: 120 * 1000).pipe(fs.createWriteStream("#{ep}/#{fileName}"))
+        next "Downloading: #{fileName}#{ if n == 1 then ' (dual)' else '' }"
+      else
+        if n == 0  # first time failing, perform for a dual page
+          next null, true
+        else  # not found
+          next "Not found: #{fileName}"
+  , (err) -> console.log err
 
 downloadEpPerform = (vol, ep, folderName) ->
   console.log bleachUri(vol, ep, folderName)
@@ -41,19 +41,24 @@ downloadEp = (vol, ep) ->
   unless fs.existsSync(ep.toString())
     fs.mkdirSync(ep.toString())
 
-  request.head bleachUri(vol, ep, 'M7_Bleach_Ch'), (err, res, body) ->
-    if res.headers['content-type'] is 'image/jpeg'
-      downloadEpPerform(vol, ep, 'M7_Bleach_Ch')
-    else
+  async.parallel [
+    (callback) ->
+      request.head bleachUri(vol, ep, 'M7_Bleach_Ch'), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(vol, ep, 'M7_Bleach_Ch')
+          callback 'a'
+    (callback) ->
       request.head bleachUri(vol, ep, 'M7_Bleach_ch'), (err, res, body) ->
         if res.headers['content-type'] is 'image/jpeg'
           downloadEpPerform(vol, ep, 'M7_Bleach_ch')
-        else
-          request.head bleachUri(vol, ep, 'm7_bleach_ch'), (err, res, body) ->
-            if res.headers['content-type'] is 'image/jpeg'
-              downloadEpPerform(vol, ep, 'm7_bleach_ch')
-            else
-              console.log 'Not found!'
+          callback 'b'
+    (callback) ->
+      request.head bleachUri(vol, ep, 'm7_bleach_ch'), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(vol, ep, 'm7_bleach_ch')
+          callback 'c'
+  ],
+  (err) -> console.log "Using option #{err[0]}\n"
 
 if program.volume and program.episode
   downloadEp(program.volume, program.episode)
