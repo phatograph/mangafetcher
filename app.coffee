@@ -6,6 +6,6 @@ download = (uri, filename) ->
     console.log('content-type:', res.headers['content-type']);
     console.log('content-length:', res.headers['content-length']);
 
-    request(uri).pipe(fs.createWriteStream(filename))
+    request(uri).pipe(fs.createWriteStream("256/#{filename}"))
 
-download('https://www.google.com/images/srpr/logo3w.png', 'google.png');
+download('http://z.mfcdn.net/store/manga/9/29-256.0/compressed/M7_Bleach_Ch256_01.jpg', 'google.png');
