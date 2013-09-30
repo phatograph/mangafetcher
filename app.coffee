@@ -4,6 +4,7 @@ fs = require('fs')
 request = require('request')
 program = require('commander')
 async = require('async')
+_ = require('lodash')
 
 program
   .version('0.0.1')
@@ -12,20 +13,36 @@ program
   .option('-e, --episode <e>', 'Specify episode', parseInt)
   .parse(process.argv)
 
-bleachUri = (vol, ep, folderName, pageNum = "01", doublePage = false) ->
-  pageNum = "#{pageNum}_#{pageNum + 1}" if doublePage
-  "http://z.mfcdn.net/store/manga/9/#{vol}-#{ep}.0/compressed/#{folderName}#{ep}_#{pageNum}.jpg"
+bleachUri = (option = {},vol, ep, folderName, pageNum = "01", doublePage = false) ->
+  option = _.extend({
+    folderName: ''
+    pageNum: 1
+    doublePage: 0
+    fileType: 'jpg'
+    ext1: ''
+    ext2: ''
+  }, option)
+
+  pageNum = if option.pageNum < 10 then "0#{option.pageNum}" else option.pageNum
+  if option.doublePage
+    pageDual = option.pageNum + 1;
+    pageDual = "0#{pageDual}" if pageDual < 10
+    pageNum += "_#{pageDual}"
+
+  "http://z.mfcdn.net/store/manga/9/#{option.vol}-#{option.ep}.0/compressed/#{option.folderName}#{option.ext1}#{option.ext2}#{pageNum}.#{option.fileType}"
 
 bleachUri2 = (vol, ep, folderName, pageNum = "01", doublePage = false) ->
   pageNum = "#{pageNum}_#{pageNum + 1}" if doublePage
   "http://z.mfcdn.net/store/manga/9/#{vol}-#{ep}.0/compressed/#{folderName}#{pageNum}.jpg"
 
-downloadImage = (uriFunc, vol, ep, folderName, pageNum, fileName) ->
+downloadImage = (uriFunc, option) ->
+  fileName = if option.pageNum < 10 then "0#{option.pageNum}.jpg" else "#{option.pageNum}.jpg"
+  uri = option.uri
+
   async.timesSeries 2, (n, next) ->
-    uri = uriFunc(vol, ep, folderName, pageNum, n)  # if n is 1, would perform for a dual page
-    request.head uri, (err, res, body) ->
+    request.head uri[n], (err, res, body) ->
       if res.headers['content-type'] is 'image/jpeg'
-        request(uri: uri, timeout: 120 * 1000).pipe(fs.createWriteStream("manga/bleach/#{vol}-#{ep}/#{fileName}"))
+        request(uri: uri[n], timeout: 120 * 1000).pipe(fs.createWriteStream("manga/bleach/#{option.vol}-#{option.ep}/#{fileName}"))
         next "Downloading: #{fileName}#{ if n == 1 then ' (dual)' else '' }"
       else
         if n == 0  # first time failing, perform for a dual page
@@ -34,49 +51,67 @@ downloadImage = (uriFunc, vol, ep, folderName, pageNum, fileName) ->
           next "Not found: #{fileName}"
   , (err) -> console.log err
 
-downloadEpPerform = (uriFunc, vol, ep, folderName) ->
-  unless fs.existsSync("manga/bleach/#{vol}-#{ep}")
-    fs.mkdirSync("manga/bleach/#{vol}-#{ep}")
+downloadEpPerform = (uriFunc, option) ->
+  unless fs.existsSync("manga/bleach/#{option.vol}-#{option.ep}")
+    fs.mkdirSync("manga/bleach/#{option.vol}-#{option.ep}")
 
-  console.log uriFunc(vol, ep, folderName)
+  console.log uriFunc(option)
 
   for i in [0..30]
     do (i) ->
-      i = "0#{i}" if i < 10
-      downloadImage(uriFunc, vol, ep, folderName, i, "#{i}.jpg")
+      option.pageNum = i
+      option.uri = []
+      option.doublePage = false
+      option.uri.push(uriFunc(option))
+      option.doublePage = true
+      option.uri.push(uriFunc(option))
+
+      downloadImage(uriFunc, option)
 
 downloadEp = (vol, ep) ->
   async.parallel [
     (callback) ->
-      request.head bleachUri(vol, ep, 'M7_Bleach_Ch'), (err, res, body) ->
+      option = vol: vol, ep: ep, folderName: 'M7_Bleach_Ch', ext1: ep, ext2: '_'
+      request.head bleachUri(option), (err, res, body) ->
         if res.headers['content-type'] is 'image/jpeg'
-          downloadEpPerform(bleachUri, vol, ep, 'M7_Bleach_Ch')
+          downloadEpPerform(bleachUri, option)
           callback 'a'
     (callback) ->
-      request.head bleachUri(vol, ep, 'M7_Bleach_ch'), (err, res, body) ->
+      option = vol: vol, ep: ep, folderName: 'M7_Bleach_ch', ext1: ep, ext2: '_'
+      request.head bleachUri(option), (err, res, body) ->
         if res.headers['content-type'] is 'image/jpeg'
-          downloadEpPerform(bleachUri, vol, ep, 'M7_Bleach_ch')
+          downloadEpPerform(bleachUri, option)
           callback 'b'
     (callback) ->
-      request.head bleachUri(vol, ep, 'm7_bleach_ch'), (err, res, body) ->
+      option = vol: vol, ep: ep, folderName: 'm7_bleach_ch', ext1: ep, ext2: '_'
+      request.head bleachUri(option), (err, res, body) ->
         if res.headers['content-type'] is 'image/jpeg'
-          downloadEpPerform(bleachUri, vol, ep, 'm7_bleach_ch')
+          downloadEpPerform(bleachUri, option)
           callback 'c'
     (callback) ->
-      request.head bleachUri2(vol, ep, 'page'), (err, res, body) ->
+      option = vol: vol, ep: ep, folderName: 'page'
+      request.head bleachUri(option), (err, res, body) ->
         if res.headers['content-type'] is 'image/jpeg'
-          downloadEpPerform(bleachUri2, vol, ep, 'm7_bleach_ch')
+          downloadEpPerform(bleachUri, option)
           callback 'd'
     (callback) ->
-      request.head bleachUri(vol, ep, 'Bleach_'), (err, res, body) ->
+      option = vol: vol, ep: ep, folderName: 'Bleach_', ext1: ep, ext2: '_'
+      request.head bleachUri(option), (err, res, body) ->
         if res.headers['content-type'] is 'image/jpeg'
-          downloadEpPerform(bleachUri, vol, ep, 'Bleach_')
+          downloadEpPerform(bleachUri, option)
           callback 'e'
     (callback) ->
-      request.head bleachUri2(vol, ep, ''), (err, res, body) ->
+      option = vol: vol, ep: ep
+      request.head bleachUri(option), (err, res, body) ->
         if res.headers['content-type'] is 'image/jpeg'
-          downloadEpPerform(bleachUri2, vol, ep, '')
+          downloadEpPerform(bleachUri, option)
           callback 'f'
+    (callback) ->
+      option = vol: vol, ep: ep, folderName: "bleach_#{ep}_ms.bleach_#{ep}_"
+      request.head bleachUri(option), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, option)
+          callback 'g'
   ],
   (err) -> console.log "Using option #{err[0]}\n"
 
