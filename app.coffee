@@ -112,6 +112,60 @@ downloadEp = (vol, ep) ->
         if res.headers['content-type'] is 'image/jpeg'
           downloadEpPerform(bleachUri, option)
           callback 'g'
+    (callback) ->
+      option = vol: vol, ep: ep, folderName: "bleach_#{ep - 20}_ms.bleach_#{ep}_pg"
+      request.head bleachUri(option), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, option)
+          callback 'h'
+    (callback) ->
+      option = vol: vol, ep: ep, folderName: "Bleach_#{ep}_pg"
+      request.head bleachUri(option), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, option)
+          callback 'i'
+    (callback) ->
+      option = vol: vol, ep: ep, folderName: "ATBleach_#{ep}_0"
+      request.head bleachUri(option), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, option)
+          callback 'j'
+    (callback) ->
+      option = vol: vol, ep: ep, folderName: "Bleach_#{ep}_MS.Bleach_#{ep}_pg"
+      request.head bleachUri(option), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, option)
+          callback 'k'
+    (callback) ->
+      option = vol: vol, ep: ep, folderName: "#{ep}.atbleach_#{ep}_0"
+      request.head bleachUri(option), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, option)
+          callback 'l'
+    (callback) ->
+      option = vol: vol, ep: ep, folderName: "atbleach_#{ep}_0"
+      request.head bleachUri(option), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, option)
+          callback 'm'
+    (callback) ->
+      option = vol: vol, ep: ep, folderName: "bleach_#{ep}_fh."
+      request.head bleachUri(option), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, option)
+          callback 'n'
+    (callback) ->
+      option = vol: vol, ep: ep, folderName: "bleach_#{ep}_binktopia."
+      request.head bleachUri(option), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, option)
+          callback 'o'
+    (callback) ->
+      option = vol: vol, ep: ep, folderName: "bleach_#{ep}_"
+      request.head bleachUri(option), (err, res, body) ->
+        if res.headers['content-type'] is 'image/jpeg'
+          downloadEpPerform(bleachUri, option)
+          callback 'p'
   ],
   (err) -> console.log "Using option #{err[0]}\n"
 
