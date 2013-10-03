@@ -114,6 +114,70 @@ downloadEp = (vol, ep) ->
     (callback) ->
       offset = ep * 10 - ~~ep * 10
       perform 18, callback, vol: vol, ep: ep, folderName: "bleach_#{109 - offset}_binktopia_v1.", volExt: offset
+    (callback) ->
+      offset = ep * 10 - ~~ep * 10
+      perform 19, callback, vol: vol, ep: ep, folderName: "", volExt: offset
+    (callback) ->
+      offset = ep * 10 - ~~ep * 10
+      perform 20, callback, vol: vol, ep: ep, folderName: "0", volExt: offset
+    (callback) ->
+      offset = ep * 10 - ~~ep * 10
+      perform 21, callback, vol: vol, ep: ep, folderName: "bleach_#{109 - offset}_sleepyfans.", volExt: offset
+    (callback) ->
+      offset = ep * 10 - ~~ep * 10
+      perform 22, callback, vol: vol, ep: ep, folderName: "bleach_#{~~ep}_sleepyfans.", volExt: offset
+    (callback) ->
+      perform 23, callback, vol: vol, ep: ep, folderName: "bleach_#{ep}_sleepyfans.0"
+    (callback) ->
+      perform 24, callback, vol: vol, ep: ep, folderName: "bleach_#{ep}."
+    (callback) ->
+      perform 25, callback, vol: vol, ep: ep, folderName: "ubleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 26, callback, vol: vol, ep: ep, folderName: "hbleach_#{ep}_by_sleepyfans."
+    (callback) ->
+      perform 27, callback, vol: vol, ep: ep, folderName: "fbleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 28, callback, vol: vol, ep: ep, folderName: "u"
+    (callback) ->
+      perform 29, callback, vol: vol, ep: ep, folderName: "l"
+    (callback) ->
+      perform 30, callback, vol: vol, ep: ep, folderName: "qbleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 30, callback, vol: vol, ep: ep, folderName: "sbleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 31, callback, vol: vol, ep: ep, folderName: "bbleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 32, callback, vol: vol, ep: ep, folderName: "pbleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 33, callback, vol: vol, ep: ep, folderName: "mbleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 34, callback, vol: vol, ep: ep, folderName: "kbleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 35, callback, vol: vol, ep: ep, folderName: "rbleach_#{ep}_"
+    (callback) ->
+      perform 36, callback, vol: vol, ep: ep, folderName: "rbleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 37, callback, vol: vol, ep: ep, folderName: "ebleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 38, callback, vol: vol, ep: ep, folderName: "nbleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 39, callback, vol: vol, ep: ep, folderName: "b"
+    (callback) ->
+      perform 40, callback, vol: vol, ep: ep, folderName: "cbleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 41, callback, vol: vol, ep: ep, folderName: "ibleach_#{ep}_sleepyfans."
+    (callback) ->
+      perform 42, callback, vol: vol, ep: ep, folderName: "sbleach_#{ep}_us."
+    (callback) ->
+      perform 43, callback, vol: vol, ep: ep, folderName: "q#{ep}_"
+    (callback) ->
+      perform 44, callback, vol: vol, ep: ep, folderName: "pbleach#{ep}_"
+    (callback) ->
+      perform 45, callback, vol: vol, ep: ep, folderName: "gbleach_#{ep}_ss."
+    (callback) ->
+      perform 46, callback, vol: vol, ep: ep, folderName: "fbleach_#{ep}_ss."
+    (callback) ->
+      perform 47, callback, vol: vol, ep: ep, folderName: "gbleach_#{ep}_sleepyfans."
   ],
   (err) -> console.log "Using option #{err}\n"
 
