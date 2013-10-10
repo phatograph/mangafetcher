@@ -7,13 +7,13 @@ Manga Fetcher fetches and downloads manga images to your machine!
 
 ### Setup
 - Clone this repo
-- `$ npm install`
-- `$ chmod a+x app.coffee`
+- `npm install`
+- `chmod a+x app.coffee`
 - Profit
 
 ### Currently supported manga
 - [Bleach](http://mangafox.me/manga/bleach/) (episode 256-386)
-  - `$ ./app.coffee -m bleach -v 44 -e 386`
-- [Shaman King Flowers](http://www.mangahere.com/manga/shaman_king_flowers/) (up to episode 8)
-  - `$ ./app.coffee -m sk-f -v 0 -e 1`
+  - `./app.coffee -m bleach -v 44 -e 386`
+- [Shaman King Flowers](http://www.mangahere.com/manga/shaman_king_flowers/) (up to episode 17)
+  - `./app.coffee -m sk-f -v 0 -e 1`
   - please keep `-v 0` as no volume is specified in this manga

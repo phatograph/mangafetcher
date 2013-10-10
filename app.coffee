@@ -179,13 +179,19 @@ downloadEp = (vol, ep) ->
       async.parallel [
         (callback) -> perform callback, vol: vol, ep: ep, folderName: "bm_t_sk_flowers_chapter_01_pg"
         (callback) -> perform callback, vol: vol, ep: ep, folderName: "dm-t_shaman_king_flowers_chapter_001_pg0", doublePageSep: '-0'
-        (callback) -> perform callback, vol: vol, ep: ep, folderName: "r0", doublePageSep: '-0'
         (callback) -> perform callback, vol: vol, ep: ep, folderName: "cm-t_shaman_king_flowers_chapter_003_pg0", doublePageSep: '-0'
+        (callback) -> perform callback, vol: vol, ep: ep, folderName: "gm-t_shaman_king_flowers_chapter_010_pg0", doublePageSep: '-0'
+        (callback) -> perform callback, vol: vol, ep: ep, folderName: "bm-t_shaman_king_flowers_chapter_011_pg0", doublePageSep: '-0'
+        (callback) -> perform callback, vol: vol, ep: ep, folderName: "nm-t_shaman_king_flowers_chapter_012_pg0", doublePageSep: '-0'
+        (callback) -> perform callback, vol: vol, ep: ep, folderName: "rm-t_shaman_king_flowers_chapter_016_pg0", doublePageSep: '-0'
+        (callback) -> perform callback, vol: vol, ep: ep, folderName: "r0", doublePageSep: '-0'
         (callback) -> perform callback, vol: vol, ep: ep, folderName: "b0", doublePageSep: '-0'
         (callback) -> perform callback, vol: vol, ep: ep, folderName: "j0", doublePageSep: '-0'
         (callback) -> perform callback, vol: vol, ep: ep, folderName: "n0", doublePageSep: '-0'
         (callback) -> perform callback, vol: vol, ep: ep, folderName: "h0", doublePageSep: '-0'
         (callback) -> perform callback, vol: vol, ep: ep, folderName: "v0", doublePageSep: '-0'
+        (callback) -> perform callback, vol: vol, ep: ep, folderName: "u0", doublePageSep: '-0'
+        (callback) -> perform callback, vol: vol, ep: ep, folderName: "f0", doublePageSep: '-0'
       ],
       (err) -> console.log "Using option #{err}\n"
 
