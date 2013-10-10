@@ -1,4 +1,4 @@
-Manga Fetcher fetches and download manga images to your machine!
+Manga Fetcher fetches and downloads manga images to your machine!
 
 ### Requirements
 
@@ -7,7 +7,8 @@ Manga Fetcher fetches and download manga images to your machine!
 
 ### Setup
 - Clone this repo
-- `chmod a+x app.coffee`
+- `$ npm install`
+- `$ chmod a+x app.coffee`
 - Profit
 
 ### Currently supported manga
