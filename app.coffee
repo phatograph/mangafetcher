@@ -72,6 +72,8 @@ downloadImage = (option) ->
   , (err) -> console.log err
 
 downloadEpPerform = (uriFunc, option) ->
+  unless fs.existsSync("manga")
+    fs.mkdirSync("manga")
   unless fs.existsSync("manga/#{program.manga}")
     fs.mkdirSync("manga/#{program.manga}")
   unless fs.existsSync("manga/#{program.manga}/#{option.vol}-#{option.ep}")
