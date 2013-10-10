@@ -6,11 +6,13 @@ Manga Fetcher fetches and downloads manga images to your machine!
 - CoffeeScript
 
 ### Installation
-`npm install -g mangafetcher`.
-
-Manga Fetcher would store manga in a folder name 'manga' in your current directory.
+`npm install -g mangafetcher`
 
 ### Currently supported manga
+
+Note that Manga Fetcher stores manga in a folder name 'manga' in your current directory.
+If the folder doesn't exist, it would be automatically created.
+
 - [Bleach](http://mangafox.me/manga/bleach/) (episode 256-386)
   - `mangafetcher -m bleach -v 44 -e 386`
 - [Shaman King Flowers](http://www.mangahere.com/manga/shaman_king_flowers/) (up to episode 17)
