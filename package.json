@@ -1,0 +1,25 @@
+{
+  "name": "mangafetcher",
+  "version": "0.0.1",
+  "description": "Manga downloader/fetcher for devs",
+  "main": "app.coffee",
+  "dependencies": {
+    "async": "~0.2.9",
+    "commander": "~2.0.0",
+    "lodash": "~2.2.0",
+    "request": "~2.27.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/phatograph/mangafetcher.git"
+  },
+  "author": "Phat Wangrungarun",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/phatograph/mangafetcher/issues"
+  }
+}
