@@ -13,8 +13,15 @@ Manga Fetcher fetches and downloads manga images to your machine!
 Note that Manga Fetcher stores manga in a folder name 'manga' in your current directory.
 If the folder doesn't exist, it would be automatically created.
 
-- [Bleach](http://mangafox.me/manga/bleach/) (episode 256-386)
+- Bleach (tested on episode 256-386)
   - `mangafetcher -m bleach -v 44 -e 386`
-- [Shaman King Flowers](http://www.mangahere.com/manga/shaman_king_flowers/) (up to episode 17)
+
+- Shaman King (tested on episode 293-300)
+  - `mangafetcher -m sk -v 33 -e 292`
+  - some episode has more than 30 pages,
+    you can adjust page amount by passing amount param,
+    e.g. `mangafetcher -m sk -v 33 -e 299 -n 80`
+
+- Shaman King Flowers
   - `mangafetcher -m sk-f -v 0 -e 1`
   - please keep `-v 0` as no volume is specified in this manga
