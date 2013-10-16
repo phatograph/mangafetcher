@@ -20,8 +20,10 @@ program
 ##############################################################################
 
 downloadEp = (vol, ep) ->
+  now = new Date()
   pageAmount = program.amount || switch program.manga
     when 'sk-f' then 50
+    when 'nisekoi' then 60
     else 30
 
   for i in [0..pageAmount]
@@ -29,9 +31,10 @@ downloadEp = (vol, ep) ->
       fileName = "#{String('00' + i).slice(-2)}.jpg"
 
       uri = switch program.manga
-        when 'sk'     then "http://www.mangahere.com/manga/shaman_king/v#{vol}/c#{ep}/#{i}.html"
-        when 'sk-f'   then "http://www.mangahere.com/manga/shaman_king_flowers/c#{String('000' + ep).slice(-3)}/#{i}.html"
-        when 'bleach' then "http://mangafox.me/manga/bleach/v#{String('00' + vol).slice(-2)}/c#{String('000' + ep).slice(-3)}/#{i}.html"
+        when 'bleach'  then "http://mangafox.me/manga/bleach/v#{String('00' + vol).slice(-2)}/c#{String('000' + ep).slice(-3)}/#{i}.html"
+        when 'sk'      then "http://www.mangahere.com/manga/shaman_king/v#{vol}/c#{ep}/#{i}.html"
+        when 'sk-f'    then "http://www.mangahere.com/manga/shaman_king_flowers/c#{String('000' + ep).slice(-3)}/#{i}.html"
+        when 'nisekoi' then "http://www.mangahere.com/manga/nisekoi_komi_naoshi/c#{String('000' + ep).slice(-3)}/#{i}.html"
 
       request uri: uri, followRedirect: false, (err, res, body) ->
         if !err and res.statusCode == 200
@@ -43,9 +46,10 @@ downloadEp = (vol, ep) ->
             fs.mkdirSync("manga/#{program.manga}/#{vol}-#{ep}")
 
           pattern = switch program.manga
-            when 'sk'     then   /http:\/\/z.mhcdn.net\/store\/manga\/65\/.+\/compressed\/.+\.jpg/
-            when 'sk-f'   then /http:\/\/z.mhcdn.net\/store\/manga\/6712\/.+\/compressed\/.+\.jpg/
-            when 'bleach' then    /http:\/\/z.mfcdn.net\/store\/manga\/9\/.+\/compressed\/.+\.jpg"/
+            when 'bleach' then      /http:\/\/z.mfcdn.net\/store\/manga\/9\/.+\/compressed\/.+\.jpg"/
+            when 'sk'     then     /http:\/\/z.mhcdn.net\/store\/manga\/65\/.+\/compressed\/.+\.jpg/
+            when 'sk-f'   then   /http:\/\/z.mhcdn.net\/store\/manga\/6712\/.+\/compressed\/.+\.jpg/
+            when 'nisekoi' then  /http:\/\/z.mhcdn.net\/store\/manga\/8945\/.+\/compressed\/.+\.jpg/
 
           if img = body.match pattern
             img_uri = img[0]
@@ -54,7 +58,13 @@ downloadEp = (vol, ep) ->
             request.head img_uri, (err2, res2, body2) ->
               if res2.headers['content-type'] is 'image/jpeg'
                 console.log "Downloading #{fileName}"
-                request(uri: img_uri, timeout: 120 * 1000).pipe(fs.createWriteStream("manga/#{program.manga}/#{vol}-#{ep}/#{fileName}"))
+
+                nowOffset = new Date(now.setMinutes(i))
+                filePath = "manga/#{program.manga}/#{vol}-#{ep}/#{fileName}"
+
+                request(uri: img_uri, timeout: 120 * 1000)
+                  .pipe fs.createWriteStream(filePath)
+                  .on 'finish', -> fs.utimesSync filePath, nowOffset, nowOffset
 
 ##############################################################################
 # App Kickoff!
