@@ -9,7 +9,7 @@ _ = require('lodash')
 program
   .version('0.0.1')
   .usage('-m [manga ex. bleach] -v [volume ex. 30] -e [episode ex. 268]')
-  .option('-m, --manga <value>', 'Specify manga, currently available are [bleach, sk-f]')
+  .option('-m, --manga <value>', 'Specify manga, currently available are [bleach, sk, sk-f, nisekoi]')
   .option('-v, --volume <n>', 'Specify volume')
   .option('-e, --episode <n>', 'Specify episode')
   .option('-n, --amount [n]', 'Specify amount (optional)')
