@@ -19,6 +19,9 @@ program
 # Image Downloading Functions
 ##############################################################################
 
+padding = (value, length) ->
+  String(('0' for i in [0...length]).join('') + value).slice(length * -1)
+
 downloadEp = (vol, ep) ->
   now = new Date()
   pageAmount = program.amount || switch program.manga
@@ -28,22 +31,23 @@ downloadEp = (vol, ep) ->
 
   for i in [0..pageAmount]
     do (i) ->
-      fileName = "#{String('00' + i).slice(-2)}.jpg"
+      fileName = "#{padding(i, 2)}.jpg"
 
       uri = switch program.manga
-        when 'bleach'  then "http://mangafox.me/manga/bleach/v#{String('00' + vol).slice(-2)}/c#{String('000' + ep).slice(-3)}/#{i}.html"
+        when 'bleach'  then "http://mangafox.me/manga/bleach/v#{padding(vol, 2)}/c#{padding(ep, 3)}/#{i}.html"
         when 'sk'      then "http://www.mangahere.com/manga/shaman_king/v#{vol}/c#{ep}/#{i}.html"
-        when 'sk-f'    then "http://www.mangahere.com/manga/shaman_king_flowers/c#{String('000' + ep).slice(-3)}/#{i}.html"
-        when 'nisekoi' then "http://www.mangahere.com/manga/nisekoi_komi_naoshi/c#{String('000' + ep).slice(-3)}/#{i}.html"
+        when 'sk-f'    then "http://www.mangahere.com/manga/shaman_king_flowers/c#{padding(ep, 3)}/#{i}.html"
+        when 'nisekoi' then "http://www.mangahere.com/manga/nisekoi_komi_naoshi/c#{padding(ep, 3)}/#{i}.html"
 
       request uri: uri, followRedirect: false, (err, res, body) ->
+        paddedVol = padding(vol, 3)
+        paddedEp = padding(ep, 3)
+
         if !err and res.statusCode == 200
-          unless fs.existsSync("manga")
-            fs.mkdirSync("manga")
-          unless fs.existsSync("manga/#{program.manga}")
-            fs.mkdirSync("manga/#{program.manga}")
-          unless fs.existsSync("manga/#{program.manga}/#{vol}-#{ep}")
-            fs.mkdirSync("manga/#{program.manga}/#{vol}-#{ep}")
+          folderPath = "manga/#{program.manga}/#{paddedVol}-#{paddedEp}"
+          for path in folderPath.split '/'
+            initPath = "#{initPath || '.'}/#{path}"
+            fs.mkdirSync(initPath) unless fs.existsSync(initPath)
 
           pattern = switch program.manga
             when 'bleach' then      /http:\/\/z.mfcdn.net\/store\/manga\/9\/.+\/compressed\/.+\.jpg"/
@@ -60,7 +64,7 @@ downloadEp = (vol, ep) ->
                 console.log "Downloading #{fileName}"
 
                 nowOffset = new Date(now.setMinutes(i))
-                filePath = "manga/#{program.manga}/#{vol}-#{ep}/#{fileName}"
+                filePath = "#{folderPath}/#{fileName}"
 
                 request(uri: img_uri, timeout: 120 * 1000)
                   .pipe fs.createWriteStream(filePath)
