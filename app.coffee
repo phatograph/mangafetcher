@@ -28,6 +28,7 @@ downloadEp = (vol, ep) ->
     when 'sk-f' then 50
     when 'nisekoi' then 60
     else 30
+  pages = [0..pageAmount]
 
   for i in [0..pageAmount]
     do (i) ->
@@ -43,7 +44,9 @@ downloadEp = (vol, ep) ->
         paddedVol = padding(vol, 3)
         paddedEp = padding(ep, 3)
 
-        if !err and res.statusCode == 200
+        if err or res.statusCode isnt 200
+          pages.splice(pages.indexOf(i), 1)
+        else
           folderPath = "manga/#{program.manga}/#{paddedVol}-#{paddedEp}"
           for path in folderPath.split '/'
             initPath = "#{initPath || '.'}/#{path}"
@@ -55,20 +58,23 @@ downloadEp = (vol, ep) ->
             when 'sk-f'   then   /http:\/\/z.mhcdn.net\/store\/manga\/6712\/.+\/compressed\/.+\.jpg/
             when 'nisekoi' then  /http:\/\/z.mhcdn.net\/store\/manga\/8945\/.+\/compressed\/.+\.jpg/
 
-          if img = body.match pattern
+          unless img = body.match pattern
+            pages.splice(pages.indexOf(i), 1)
+          else
             img_uri = img[0]
             img_uri = img_uri.slice(0, -1) if img_uri.match /"$/ # Remove trailing `"`
 
             request.head img_uri, (err2, res2, body2) ->
               if res2.headers['content-type'] is 'image/jpeg'
-                console.log "Downloading #{fileName}"
-
                 nowOffset = new Date(now.setMinutes(i))
                 filePath = "#{folderPath}/#{fileName}"
 
                 request(uri: img_uri, timeout: 120 * 1000)
                   .pipe fs.createWriteStream(filePath)
-                  .on 'finish', -> fs.utimesSync filePath, nowOffset, nowOffset
+                  .on 'finish', ->
+                    pages.splice(pages.indexOf(i), 1)
+                    console.log "Remaining: #{pages.join(', ')}" if pages.length
+                    fs.utimesSync filePath, nowOffset, nowOffset
 
 ##############################################################################
 # App Kickoff!
