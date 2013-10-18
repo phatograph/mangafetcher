@@ -1,10 +1,12 @@
 #!/usr/bin/env coffee
 
-fs = require('fs')
+fs      = require('fs')
 request = require('request')
 program = require('commander')
-async = require('async')
-_ = require('lodash')
+async   = require('async')
+_       = require('lodash')
+exec    = require('child_process').exec
+moment  = require('moment')
 
 program
   .version('0.0.1')
@@ -75,7 +77,7 @@ downloadEp = (vol, ep) ->
                   .on 'finish', ->
                     pages.splice(pages.indexOf(i), 1)
                     console.log "Remaining: #{pages.join(', ')}" if pages.length
-                    fs.utimesSync filePath, nowOffset, nowOffset
+                    exec("touch -t #{moment().format('YYYYMMDD')}#{padding(i, 4)} #{filePath}")
 
 ##############################################################################
 # App Kickoff!
