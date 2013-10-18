@@ -12,7 +12,8 @@ program
   .option('-m, --manga <value>', 'Specify manga, currently available are [bleach, sk, sk-f, nisekoi]')
   .option('-v, --volume <n>', 'Specify volume')
   .option('-e, --episode <n>', 'Specify episode')
-  .option('-n, --amount [n]', 'Specify amount (optional)')
+  .option('-p, --pages [items]', 'Specify pages (optional) e.g. -p 2,4,5', (val) -> val.split(','))
+  .option('-n, --amount [n]', 'Specify amount (optional) e.g. -n 3')
   .parse(process.argv)
 
 ##############################################################################
@@ -28,9 +29,9 @@ downloadEp = (vol, ep) ->
     when 'sk-f' then 50
     when 'nisekoi' then 60
     else 30
-  pages = [0..pageAmount]
+  pages = program.pages || [0..pageAmount]
 
-  for i in [0..pageAmount]
+  for i in _.clone pages
     do (i) ->
       fileName = "#{padding(i, 2)}.jpg"
 
