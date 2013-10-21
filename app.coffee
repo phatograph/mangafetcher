@@ -11,7 +11,7 @@ moment  = require('moment')
 program
   .version('0.0.1')
   .usage('-m [manga ex. bleach] -v [volume ex. 30] -e [episode ex. 268]')
-  .option('-m, --manga <value>', 'Specify manga, currently available are [bleach, sk, sk-f, nisekoi]')
+  .option('-m, --manga <value>', 'Specify manga, currently available are [bleach, sk, sk-f, nisekoi, denpa-kyoushi]')
   .option('-v, --volume <n>', 'Specify volume')
   .option('-e, --episode <n>', 'Specify episode')
   .option('-p, --pages [items]', 'Specify pages (optional) e.g. -p 2,4,5', (val) -> val.split(','))
@@ -28,8 +28,9 @@ padding = (value, length) ->
 downloadEp = (vol, ep) ->
   now = new Date()
   pageAmount = program.amount || switch program.manga
-    when 'sk-f' then 50
-    when 'nisekoi' then 60
+    when 'sk-f'          then 50
+    when 'nisekoi'       then 60
+    when 'denpa-kyoushi' then 70
     else 30
   pages = program.pages || [0..pageAmount]
 
@@ -38,10 +39,11 @@ downloadEp = (vol, ep) ->
       fileName = "#{padding(i, 2)}.jpg"
 
       uri = switch program.manga
-        when 'bleach'  then "http://mangafox.me/manga/bleach/v#{padding(vol, 2)}/c#{padding(ep, 3)}/#{i}.html"
-        when 'sk'      then "http://www.mangahere.com/manga/shaman_king/v#{vol}/c#{ep}/#{i}.html"
-        when 'sk-f'    then "http://www.mangahere.com/manga/shaman_king_flowers/c#{padding(ep, 3)}/#{i}.html"
-        when 'nisekoi' then "http://www.mangahere.com/manga/nisekoi_komi_naoshi/c#{padding(ep, 3)}/#{i}.html"
+        when 'bleach'        then "http://mangafox.me/manga/bleach/v#{padding(vol, 2)}/c#{padding(ep, 3)}/#{i}.html"
+        when 'sk'            then "http://www.mangahere.com/manga/shaman_king/v#{vol}/c#{ep}/#{i}.html"
+        when 'sk-f'          then "http://www.mangahere.com/manga/shaman_king_flowers/c#{padding(ep, 3)}/#{i}.html"
+        when 'nisekoi'       then "http://www.mangahere.com/manga/nisekoi_komi_naoshi/c#{padding(ep, 3)}/#{i}.html"
+        when 'denpa-kyoushi' then "http://www.mangahere.com/manga/denpa_kyoushi/c#{padding(ep, 3)}/#{i}.html"
 
       request uri: uri, followRedirect: false, (err, res, body) ->
         paddedVol = padding(vol, 3)
@@ -56,10 +58,11 @@ downloadEp = (vol, ep) ->
             fs.mkdirSync(initPath) unless fs.existsSync(initPath)
 
           pattern = switch program.manga
-            when 'bleach' then      /http:\/\/z.mfcdn.net\/store\/manga\/9\/.+\/compressed\/.+\.jpg"/
-            when 'sk'     then     /http:\/\/z.mhcdn.net\/store\/manga\/65\/.+\/compressed\/.+\.jpg/
-            when 'sk-f'   then   /http:\/\/z.mhcdn.net\/store\/manga\/6712\/.+\/compressed\/.+\.jpg/
-            when 'nisekoi' then  /http:\/\/z.mhcdn.net\/store\/manga\/8945\/.+\/compressed\/.+\.jpg/
+            when 'bleach'        then      /http:\/\/z.mfcdn.net\/store\/manga\/9\/.+\/compressed\/.+\.jpg"/
+            when 'sk'            then     /http:\/\/z.mhcdn.net\/store\/manga\/65\/.+\/compressed\/.+\.jpg/
+            when 'sk-f'          then   /http:\/\/z.mhcdn.net\/store\/manga\/6712\/.+\/compressed\/.+\.jpg/
+            when 'nisekoi'       then   /http:\/\/z.mhcdn.net\/store\/manga\/8945\/.+\/compressed\/.+\.jpg/
+            when 'denpa-kyoushi' then  /http:\/\/z.mhcdn.net\/store\/manga\/10266\/.+\/compressed\/.+\.jpg/
 
           unless img = body.match pattern
             pages.splice(pages.indexOf(i), 1)
