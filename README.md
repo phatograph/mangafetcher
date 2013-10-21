@@ -29,3 +29,7 @@ If the folder doesn't exist, it would be automatically created.
 - Denpa Kyoushi
   - `mangafetcher -m denpa-kyoushi -v 0 -e 1`
   - please keep `-v 0` as no volume is specified in this manga
+
+- Trinity Seven
+  - `mangafetcher -m trinity-seven -v 0 -e 1`
+  - please keep `-v 0` as no volume is specified in this manga
