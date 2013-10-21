@@ -36,7 +36,7 @@ mangaUrls =
 padding = (value, length) ->
   String(('0' for i in [0...length]).join('') + value).slice(length * -1)
 
-downloadEp = (vol, ep) ->
+mangaDownload = (vol, ep) ->
   now = new Date()
   pageAmount = program.amount || switch program.manga
     when 'sk-f'          then 50
@@ -92,16 +92,14 @@ downloadEp = (vol, ep) ->
                     console.log "Remaining: #{pages.join(', ')}" if pages.length
                     exec("touch -t #{moment().format('YYYYMMDD')}#{padding(i, 4)} #{filePath}")  # Since iOS seems to sort images by created date, this should do the trick
 
-check = ->
-  urls = (name for name, url of mangaUrls)
-  for name in urls
-    do (name) ->
+mangaList = ->
+  for name, url of mangaUrls
+    do (name, url) ->
       request uri: "#{mangaUrls[name]}/", followRedirect: false, (err, res, body) ->
         $          = cheerio.load(body)
-        latestEp   = $('div.detail_list span.left')
         label      = switch name
-                      when 'bleach' then  $('a.tips').first().text().trim()
-                      else latestEp.find('a.color_0077').first().text().trim()
+                      when 'bleach' then $('a.tips').first().text().trim()
+                      else $('div.detail_list span.left a.color_0077').first().text().trim()
         labelNum   = ~~(_.last(label.split(' ')))
         folderPath = "./manga/#{name}"
 
@@ -117,8 +115,8 @@ check = ->
 # App Kickoff!
 ##############################################################################
 
-if program.list then check()
+if program.list then mangaList()
 else if program.manga and program.volume and program.episode
-  downloadEp(program.volume, program.episode)
+  mangaDownload(program.volume, program.episode)
 else
   console.log 'Error: please specify manga, volume and episode'
