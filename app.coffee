@@ -8,6 +8,7 @@ _       = require('lodash')
 exec    = require('child_process').exec
 moment  = require('moment')
 cheerio = require('cheerio')
+clc     = require('cli-color')
 
 program
   .version('0.0.1')
@@ -101,15 +102,16 @@ check = ->
         label      = switch name
                       when 'bleach' then  $('a.tips').first().text().trim()
                       else latestEp.find('a.color_0077').first().text().trim()
-        labelNum   = _.last(label.split(' '))
+        labelNum   = ~~(_.last(label.split(' ')))
         folderPath = "./manga/#{name}"
 
         if fs.existsSync(folderPath)
           fs.readdir folderPath, (e, folders) ->
             _.remove(folders, (x) -> x is '.DS_Store')
             latestFolder = ~~(_.last(_.last(folders).split('-'))) if folders.length
+            color = if latestFolder is labelNum then clc.green else clc.red
 
-            console.log "#{label} (local: #{latestFolder || '-'}/#{labelNum})"
+            console.log "#{label} (local: #{color(latestFolder || '-')}/#{labelNum})"
 
 ##############################################################################
 # App Kickoff!
