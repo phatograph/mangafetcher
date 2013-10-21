@@ -7,6 +7,7 @@ async   = require('async')
 _       = require('lodash')
 exec    = require('child_process').exec
 moment  = require('moment')
+cheerio = require('cheerio')
 
 program
   .version('0.0.1')
@@ -16,11 +17,20 @@ program
   .option('-e, --episode <n>', 'Specify episode')
   .option('-p, --pages [items]', 'Specify pages (optional) e.g. -p 2,4,5', (val) -> val.split(','))
   .option('-n, --amount [n]', 'Specify amount (optional) e.g. -n 3')
+  .option('-l, --list', 'List mode')
   .parse(process.argv)
 
 ##############################################################################
 # Image Downloading Functions
 ##############################################################################
+
+mangaUrls =
+  'bleach':        "http://mangafox.me/manga/bleach"
+  'sk':            "http://www.mangahere.com/manga/shaman_king"
+  'sk-f':          "http://www.mangahere.com/manga/shaman_king_flowers"
+  'nisekoi':       "http://www.mangahere.com/manga/nisekoi_komi_naoshi"
+  'denpa-kyoushi': "http://www.mangahere.com/manga/denpa_kyoushi"
+  'trinity-seven': "http://www.mangahere.com/manga/trinity_seven"
 
 padding = (value, length) ->
   String(('0' for i in [0...length]).join('') + value).slice(length * -1)
@@ -38,12 +48,9 @@ downloadEp = (vol, ep) ->
   for i in _.clone pages
     do (i) ->
       uri = switch program.manga
-        when 'bleach'        then "http://mangafox.me/manga/bleach/v#{padding(vol, 2)}/c#{padding(ep, 3)}/#{i}.html"
-        when 'sk'            then "http://www.mangahere.com/manga/shaman_king/v#{vol}/c#{ep}/#{i}.html"
-        when 'sk-f'          then "http://www.mangahere.com/manga/shaman_king_flowers/c#{padding(ep, 3)}/#{i}.html"
-        when 'nisekoi'       then "http://www.mangahere.com/manga/nisekoi_komi_naoshi/c#{padding(ep, 3)}/#{i}.html"
-        when 'denpa-kyoushi' then "http://www.mangahere.com/manga/denpa_kyoushi/c#{padding(ep, 3)}/#{i}.html"
-        when 'trinity-seven' then "http://www.mangahere.com/manga/trinity_seven/c#{padding(ep, 3)}/#{i}.html"
+        when 'bleach'        then "#{mangaUrls[program.manga]}/v#{padding(vol, 2)}/c#{padding(ep, 3)}/#{i}.html"
+        when 'sk'            then "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}/#{i}.html"
+        else                      "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}/#{i}.html"
 
       request uri: uri, followRedirect: false, (err, res, body) ->
         paddedVol = padding(vol, 3)
@@ -52,11 +59,6 @@ downloadEp = (vol, ep) ->
         if err or res.statusCode isnt 200
           pages.splice(pages.indexOf(i), 1)
         else
-          folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
-          for path in folderPath.split '/'
-            initPath = "#{initPath || '.'}/#{path}"
-            fs.mkdirSync(initPath) unless fs.existsSync(initPath)
-
           pattern = switch program.manga
             when 'bleach'        then      /http:\/\/z.mfcdn.net\/store\/manga\/9\/.+\/compressed\/.+\.jpg"/
             when 'sk'            then     /http:\/\/z.mhcdn.net\/store\/manga\/65\/.+\/compressed\/.+\.jpg/
@@ -72,6 +74,11 @@ downloadEp = (vol, ep) ->
             imgUri = imgUri.slice(0, -1) if imgUri.match /"$/  # Remove trailing `"`
 
             request.head imgUri, (err2, res2, body2) ->
+              folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
+              for path in folderPath.split '/'
+                initPath = "#{initPath || '.'}/#{path}"
+                fs.mkdirSync(initPath) unless fs.existsSync(initPath)
+
               if res2.headers['content-type'] is 'image/jpeg'
                 nowOffset = new Date(now.setMinutes(i))
                 fileName = "#{padding(i, 2)}.jpg"
@@ -84,11 +91,32 @@ downloadEp = (vol, ep) ->
                     console.log "Remaining: #{pages.join(', ')}" if pages.length
                     exec("touch -t #{moment().format('YYYYMMDD')}#{padding(i, 4)} #{filePath}")  # Since iOS seems to sort images by created date, this should do the trick
 
+check = ->
+  urls = (name for name, url of mangaUrls)
+  for name in urls
+    do (name) ->
+      request uri: "#{mangaUrls[name]}/", followRedirect: false, (err, res, body) ->
+        $          = cheerio.load(body)
+        latestEp   = $('div.detail_list span.left')
+        label      = switch name
+                      when 'bleach' then  $('a.tips').first().text().trim()
+                      else latestEp.find('a.color_0077').first().text().trim()
+        labelNum   = _.last(label.split(' '))
+        folderPath = "./manga/#{name}"
+
+        if fs.existsSync(folderPath)
+          fs.readdir folderPath, (e, folders) ->
+            _.remove(folders, (x) -> x is '.DS_Store')
+            latestFolder = ~~(_.last(_.last(folders).split('-'))) if folders.length
+
+            console.log "#{label} (local: #{latestFolder || '-'}/#{labelNum})"
+
 ##############################################################################
 # App Kickoff!
 ##############################################################################
 
-if program.manga and program.volume and program.episode
+if program.list then check()
+else if program.manga and program.volume and program.episode
   downloadEp(program.volume, program.episode)
 else
   console.log 'Error: please specify manga, volume and episode'
