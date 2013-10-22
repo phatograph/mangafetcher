@@ -58,7 +58,7 @@ mangaDownload = (vol, ep) ->
     pages = program.pages || [0..pageAmount]
     uri = uri.slice(0, -1) if uri.match /\/$/  # Remove trailing `/`
 
-    console.log clc.green "#{pages.length} page(s)"
+    console.log clc.green "Downloading up to #{pages.length} page(s)"
     for i in _.clone pages
       do (i) ->
         request uri: "#{uri}/#{i}.html", followRedirect: false, (err, res, body) ->
@@ -97,8 +97,15 @@ mangaDownload = (vol, ep) ->
                     .pipe fs.createWriteStream(filePath)
                     .on 'finish', ->
                       pages.splice(pages.indexOf(i), 1)
-                      console.log "Remaining: #{pages.join(', ')}" if pages.length
                       exec("touch -t #{moment().format('YYYYMMDD')}#{padding(i, 4)} #{filePath}")  # Since iOS seems to sort images by created date, this should do the trick
+
+                      if pages.length == 0
+                        console.log clc.green "\nDone!"
+                      else if pages.length > 3
+                        process.stdout.write "#"
+                        process.stdout.write " " unless (pageAmount - pages.length) % 5
+                      else
+                        process.stdout.write "\nRemaining: #{pages.join(', ')}" if pages.length
 
 mangaList = ->
   for name, url of mangaUrls
