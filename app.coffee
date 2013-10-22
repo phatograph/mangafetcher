@@ -91,7 +91,7 @@ mangaDownload = (vol, ep) ->
                 if res2.headers['content-type'] is 'image/jpeg'
                   nowOffset = new Date(now.setMinutes(i))
                   fileName = "#{padding(i, 2)}.jpg"
-                  filePath = "#{folderPath}/#{fileName}"
+                  filePath = "./#{folderPath}/#{fileName}"
 
                   request(uri: imgUri, timeout: 120 * 1000)
                     .pipe fs.createWriteStream(filePath)
