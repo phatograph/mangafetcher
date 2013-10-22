@@ -18,9 +18,6 @@ If the folder doesn't exist, it would be automatically created.
 
 - Shaman King (tested on episode 293-300)
   - `mangafetcher -m sk -v 33 -e 292`
-  - some episode has more than 30 pages,
-    you can adjust page amount by passing amount param,
-    e.g. `mangafetcher -m sk -v 33 -e 299 -n 80`
 
 - Shaman King Flowers
   - `mangafetcher -m sk-f -v 0 -e 1`
@@ -33,3 +30,5 @@ If the folder doesn't exist, it would be automatically created.
 - Trinity Seven
   - `mangafetcher -m trinity-seven -v 0 -e 1`
   - please keep `-v 0` as no volume is specified in this manga
+
+All manga credits to [mangahere.com](http://mangahere.com) and [mangafox.me](http://mangafox.me)!
