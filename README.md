@@ -6,7 +6,10 @@ Manga Fetcher fetches and downloads manga images to your machine!
 - CoffeeScript
 
 ### Installation
-`npm install -g mangafetcher`
+
+``` bash
+npm install -g mangafetcher
+```
 
 ### Currently supported manga
 
