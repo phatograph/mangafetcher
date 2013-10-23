@@ -48,7 +48,7 @@ mangaDownload = (vol, ep) ->
 
   request uri: uri, followRedirect: false, (err, res, body) ->
     if err or res.statusCode isnt 200
-      console.log clc.red "Oops, something went wrong (Error: #{res.statusCode})"
+      console.log clc.red "Oops, something went wrong  #{'(Error: ' + res.statusCode + ')'if res}"
       return false
 
     $ = cheerio.load(body)
@@ -102,8 +102,8 @@ mangaDownload = (vol, ep) ->
                       if pages.length == 0
                         console.log clc.green "\nDone!"
                       else if pages.length > 3
-                        process.stdout.write "#"
-                        process.stdout.write " " unless (pageAmount - pages.length) % 5
+                        process.stdout.write "."
+                        process.stdout.write "#{pageAmount - pages.length}" unless (pageAmount - pages.length) % 5
                       else
                         process.stdout.write "\nRemaining: #{pages.join(', ')}" if pages.length
 
@@ -131,7 +131,7 @@ mangaList = ->
 ##############################################################################
 
 if program.list then mangaList()
-else if program.manga and program.volume and program.episode
-  mangaDownload(program.volume, program.episode)
+else if program.manga and program.episode
+  mangaDownload(program.volume || 0, program.episode)
 else
   console.log 'Error: please specify manga, volume and episode'
