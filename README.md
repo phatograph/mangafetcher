@@ -31,4 +31,18 @@ If the folder doesn't exist, it would be automatically created.
   - `mangafetcher -m trinity-seven -v 0 -e 1`
   - please keep `-v 0` as no volume is specified in this manga
 
+### List mode
+
+If you already downloaded some manga and want to check for updates.
+You could run `mangafetcher -l` to check them.
+
+``` bash
+$ mangafetcher -l
+Shaman King Flowers 17 (local: 17/17)
+Trinity Seven 32 (local: 4/32)
+Nisekoi (KOMI Naoshi) 95 (local: 95/95)
+Denpa Kyoushi 92 (local: 59/92)
+Bleach 553 (local: 259/553)
+```
+
 All manga credits to [mangahere.com](http://mangahere.com) and [mangafox.me](http://mangafox.me)!
