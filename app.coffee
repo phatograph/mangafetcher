@@ -102,8 +102,10 @@ mangaDownload = (vol, ep) ->
                       if pages.length == 0
                         console.log clc.green "\nDone!"
                       else if pages.length > 3
-                        process.stdout.write "."
-                        process.stdout.write "#{pageAmount - pages.length}" unless (pageAmount - pages.length) % 5
+                        if (pageAmount - pages.length) % 5
+                          process.stdout.write "."
+                        else
+                          process.stdout.write "#{pageAmount - pages.length}"
                       else
                         process.stdout.write "\nRemaining: #{pages.join(', ')}" if pages.length
 
