@@ -73,16 +73,15 @@ mangaDownload = (vol, ep) ->
           if err or res.statusCode isnt 200
             pages.splice(pages.indexOf(i), 1)
           else
-            img = switch program.manga
-              when 'bleach', 'one-piece' then
-                   /http:\/\/.\.m.cdn.net\/store\/manga\/\d+\/.+\/compressed\/.+\.jpg"/
-              else /http:\/\/.\.m.cdn.net\/store\/manga\/\d+\/.+\/compressed\/.+\.jpg/
+            img = $$('img#image')
 
-            unless img = body.match pattern
+            unless img.length
               pages.splice(pages.indexOf(i), 1)
             else
-              imgUri = img[0]
-              imgUri = imgUri.slice(0, -1) if imgUri.match /"$/  # Remove trailing `"`
+              imgUri = switch program.manga
+                when 'bleach', 'one-piece'
+                     img.attr('onerror').match(/http.+jpg/)[0]  # New manga seems to fallback to another CDN
+                else img.attr('src')
 
               request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
                 if res2.headers['content-type'] is 'image/jpeg'
