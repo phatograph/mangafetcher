@@ -31,6 +31,7 @@ mangaUrls =
   'nisekoi':       "http://www.mangahere.com/manga/nisekoi_komi_naoshi"
   'denpa-kyoushi': "http://www.mangahere.com/manga/denpa_kyoushi"
   'trinity-seven': "http://www.mangahere.com/manga/trinity_seven"
+  'mkm'          : "http://www.mangahere.com/manga/minamoto_kun_monogatari"
 
 ##############################################################################
 # Image Downloading Functions
@@ -75,6 +76,7 @@ mangaDownload = (vol, ep) ->
               when 'nisekoi'       then   /http:\/\/z.mhcdn.net\/store\/manga\/8945\/.+\/compressed\/.+\.jpg/
               when 'denpa-kyoushi' then  /http:\/\/z.mhcdn.net\/store\/manga\/10266\/.+\/compressed\/.+\.jpg/
               when 'trinity-seven' then   /http:\/\/z.mhcdn.net\/store\/manga\/9272\/.+\/compressed\/.+\.jpg/
+              when 'mkm'           then  /http:\/\/z.mhcdn.net\/store\/manga\/10005\/.+\/compressed\/.+\.jpg/
 
             unless img = body.match pattern
               pages.splice(pages.indexOf(i), 1)
@@ -126,7 +128,7 @@ mangaList = ->
             latestFolder = ~~(_.last(_.last(folders).split('-'))) if folders.length
             color = if latestFolder is labelNum then clc.green else clc.red
 
-            console.log "#{label} (local: #{color(latestFolder || '-')}/#{labelNum})"
+            console.log "#{label} [#{clc.yellow name}] (local: #{color(latestFolder || '-')}/#{labelNum})"
 
 ##############################################################################
 # App Kickoff!
