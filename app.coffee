@@ -26,12 +26,13 @@ program
 
 mangaUrls =
   'bleach':        "http://mangafox.me/manga/bleach"
+  'one-piece':     "http://mangafox.me/manga/one_piece"
   'sk':            "http://www.mangahere.com/manga/shaman_king"
   'sk-f':          "http://www.mangahere.com/manga/shaman_king_flowers"
   'nisekoi':       "http://www.mangahere.com/manga/nisekoi_komi_naoshi"
   'denpa-kyoushi': "http://www.mangahere.com/manga/denpa_kyoushi"
   'trinity-seven': "http://www.mangahere.com/manga/trinity_seven"
-  'mkm'          : "http://www.mangahere.com/manga/minamoto_kun_monogatari"
+  'mkm':           "http://www.mangahere.com/manga/minamoto_kun_monogatari"
 
 ##############################################################################
 # Image Downloading Functions
@@ -43,9 +44,10 @@ padding = (value, length) ->
 mangaDownload = (vol, ep) ->
   now = new Date()
   uri = switch program.manga
-    when 'bleach' then "#{mangaUrls[program.manga]}/v#{padding(vol, 2)}/c#{padding(ep, 3)}/"
-    when 'sk'     then "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
-    else               "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}"
+    when 'bleach', 'one-piece'
+                   "#{mangaUrls[program.manga]}/v#{padding(vol, 2)}/c#{padding(ep, 3)}/"
+    when 'sk' then "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
+    else           "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}"
 
   request uri: uri, followRedirect: false, (err, res, body) ->
     if err or res.statusCode isnt 200
@@ -54,8 +56,9 @@ mangaDownload = (vol, ep) ->
 
     $ = cheerio.load(body)
     pageAmount = switch program.manga
-      when 'bleach' then $('form#top_bar select.m option').length
-      else               $('section.readpage_top select.wid60 option').length
+      when 'bleach', 'one-piece'
+            $('form#top_bar select.m option').length
+      else  $('section.readpage_top select.wid60 option').length
     pages = program.pages || [0..pageAmount]
     uri = uri.slice(0, -1) if uri.match /\/$/  # Remove trailing `/`
 
@@ -63,34 +66,27 @@ mangaDownload = (vol, ep) ->
     for i in _.clone pages
       do (i) ->
         request uri: "#{uri}/#{i}.html", followRedirect: false, (err, res, body) ->
+          $$        = cheerio.load(body)
           paddedVol = padding(vol, 3)
-          paddedEp = padding(ep, 3)
+          paddedEp  = padding(ep, 3)
 
           if err or res.statusCode isnt 200
             pages.splice(pages.indexOf(i), 1)
           else
-            pattern = switch program.manga
-              when 'bleach'        then      /http:\/\/z.mfcdn.net\/store\/manga\/9\/.+\/compressed\/.+\.jpg"/
-              when 'sk'            then     /http:\/\/z.mhcdn.net\/store\/manga\/65\/.+\/compressed\/.+\.jpg/
-              when 'sk-f'          then   /http:\/\/z.mhcdn.net\/store\/manga\/6712\/.+\/compressed\/.+\.jpg/
-              when 'nisekoi'       then   /http:\/\/z.mhcdn.net\/store\/manga\/8945\/.+\/compressed\/.+\.jpg/
-              when 'denpa-kyoushi' then  /http:\/\/z.mhcdn.net\/store\/manga\/10266\/.+\/compressed\/.+\.jpg/
-              when 'trinity-seven' then   /http:\/\/z.mhcdn.net\/store\/manga\/9272\/.+\/compressed\/.+\.jpg/
-              when 'mkm'           then  /http:\/\/z.mhcdn.net\/store\/manga\/10005\/.+\/compressed\/.+\.jpg/
+            img = $$('img#image')
 
-            unless img = body.match pattern
+            unless img.length
               pages.splice(pages.indexOf(i), 1)
             else
-              imgUri = img[0]
-              imgUri = imgUri.slice(0, -1) if imgUri.match /"$/  # Remove trailing `"`
+              imgUri = img.attr('src')
 
               request.head imgUri, (err2, res2, body2) ->
-                folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
-                for path in folderPath.split '/'
-                  initPath = "#{initPath || '.'}/#{path}"
-                  fs.mkdirSync(initPath) unless fs.existsSync(initPath)
-
                 if res2.headers['content-type'] is 'image/jpeg'
+                  folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
+                  for path in folderPath.split '/'
+                    initPath = "#{initPath || '.'}/#{path}"
+                    fs.mkdirSync(initPath) unless fs.existsSync(initPath)
+
                   nowOffset = new Date(now.setMinutes(i))
                   fileName = "#{padding(i, 2)}.jpg"
                   filePath = "./#{folderPath}/#{fileName}"
