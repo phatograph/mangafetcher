@@ -116,7 +116,8 @@ mangaList = ->
       request uri: "#{mangaUrls[name]}/", followRedirect: false, (err, res, body) ->
         $          = cheerio.load(body)
         label      = switch name
-                      when 'bleach' then $('a.tips').first().text().trim()
+                      when 'bleach', 'one-piece'
+                           $('a.tips').first().text().trim()
                       else $('div.detail_list span.left a.color_0077').first().text().trim()
         labelNum   = ~~(_.last(label.split(' ')))
         folderPath = "./manga/#{name}"

@@ -16,10 +16,14 @@ npm install -g mangafetcher
 Note that Manga Fetcher stores manga in a folder name 'manga' in your current directory.
 If the folder doesn't exist, it would be automatically created.
 
-- Bleach (tested on episode 256-386)
+- One Piece (Experimental)
+  - `mangafetcher -m one-piece -v 1 -e 1`
+  - `mangefetcher -m one-piece -v TBD -e 713` for TBD volumes
+
+- Bleach
   - `mangafetcher -m bleach -v 44 -e 386`
 
-- Shaman King (tested on episode 293-300)
+- Shaman
   - `mangafetcher -m sk -v 33 -e 292`
 
 - Shaman King Flowers
