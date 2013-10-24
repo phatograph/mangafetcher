@@ -1,6 +1,6 @@
 {
   "name": "mangafetcher",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Manga downloader/fetcher for devs",
   "main": "app.coffee",
   "dependencies": {
