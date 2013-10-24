@@ -45,13 +45,13 @@ mangaDownload = (vol, ep) ->
   now = new Date()
   uri = switch program.manga
     when 'bleach', 'one-piece'
-                   "#{mangaUrls[program.manga]}/v#{padding(vol, 2)}/c#{padding(ep, 3)}/"
+                   "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
     when 'sk' then "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
     else           "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}"
 
-  request uri: uri, followRedirect: false, (err, res, body) ->
+  request uri: uri, (err, res, body) ->
     if err or res.statusCode isnt 200
-      console.log clc.red "Oops, something went wrong  #{'(Error: ' + res.statusCode + ')'if res}"
+      console.log clc.red "Oops, something went wrong #{'(Error: ' + res.statusCode + ')'if res}"
       return false
 
     $ = cheerio.load(body)
@@ -73,14 +73,18 @@ mangaDownload = (vol, ep) ->
           if err or res.statusCode isnt 200
             pages.splice(pages.indexOf(i), 1)
           else
-            img = $$('img#image')
+            img = switch program.manga
+              when 'bleach', 'one-piece' then
+                   /http:\/\/.\.m.cdn.net\/store\/manga\/\d+\/.+\/compressed\/.+\.jpg"/
+              else /http:\/\/.\.m.cdn.net\/store\/manga\/\d+\/.+\/compressed\/.+\.jpg/
 
-            unless img.length
+            unless img = body.match pattern
               pages.splice(pages.indexOf(i), 1)
             else
-              imgUri = img.attr('src')
+              imgUri = img[0]
+              imgUri = imgUri.slice(0, -1) if imgUri.match /"$/  # Remove trailing `"`
 
-              request.head imgUri, (err2, res2, body2) ->
+              request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
                 if res2.headers['content-type'] is 'image/jpeg'
                   folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
                   for path in folderPath.split '/'
