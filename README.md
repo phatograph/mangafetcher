@@ -20,6 +20,9 @@ If the folder doesn't exist, it would be automatically created.
   - `mangafetcher -m one-piece -v 1 -e 1`
   - `mangefetcher -m one-piece -v TBD -e 713` for TBD volumes
 
+- Naruto (Experimental)
+  - `mangafetcjer -m naruto -v 1 -e 1`
+
 - Bleach
   - `mangafetcher -m bleach -v 44 -e 386`
 

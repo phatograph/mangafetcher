@@ -25,14 +25,15 @@ program
 ##############################################################################
 
 mangaUrls =
-  'bleach':        "http://mangafox.me/manga/bleach"
-  'one-piece':     "http://mangafox.me/manga/one_piece"
-  'sk':            "http://www.mangahere.com/manga/shaman_king"
-  'sk-f':          "http://www.mangahere.com/manga/shaman_king_flowers"
-  'nisekoi':       "http://www.mangahere.com/manga/nisekoi_komi_naoshi"
-  'denpa-kyoushi': "http://www.mangahere.com/manga/denpa_kyoushi"
-  'trinity-seven': "http://www.mangahere.com/manga/trinity_seven"
-  'mkm':           "http://www.mangahere.com/manga/minamoto_kun_monogatari"
+  'bleach'        : "http://mangafox.me/manga/bleach"
+  'one-piece'     : "http://mangafox.me/manga/one_piece"
+  'naruto'        : "http://mangafox.me/manga/naruto"
+  'sk'            : "http://www.mangahere.com/manga/shaman_king"
+  'sk-f'          : "http://www.mangahere.com/manga/shaman_king_flowers"
+  'nisekoi'       : "http://www.mangahere.com/manga/nisekoi_komi_naoshi"
+  'denpa-kyoushi' : "http://www.mangahere.com/manga/denpa_kyoushi"
+  'trinity-seven' : "http://www.mangahere.com/manga/trinity_seven"
+  'mkm'           : "http://www.mangahere.com/manga/minamoto_kun_monogatari"
 
 ##############################################################################
 # Image Downloading Functions
@@ -44,7 +45,7 @@ padding = (value, length) ->
 mangaDownload = (vol, ep) ->
   now = new Date()
   uri = switch program.manga
-    when 'bleach', 'one-piece'
+    when 'bleach', 'one-piece', 'naruto'
                    "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
     when 'sk' then "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
     else           "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}"
@@ -56,7 +57,7 @@ mangaDownload = (vol, ep) ->
 
     $ = cheerio.load(body)
     pageAmount = switch program.manga
-      when 'bleach', 'one-piece'
+      when 'bleach', 'one-piece', 'naruto'
             $('form#top_bar select.m option').length
       else  $('section.readpage_top select.wid60 option').length
     pages = program.pages || [0..pageAmount]
@@ -79,7 +80,7 @@ mangaDownload = (vol, ep) ->
               pages.splice(pages.indexOf(i), 1)
             else
               imgUri = switch program.manga
-                when 'bleach', 'one-piece'
+                when 'bleach', 'one-piece', 'naruto'
                      img.attr('onerror').match(/http.+jpg/)[0]  # New manga seems to fallback to another CDN
                 else img.attr('src')
 
@@ -116,7 +117,7 @@ mangaList = ->
       request uri: "#{mangaUrls[name]}/", followRedirect: false, (err, res, body) ->
         $          = cheerio.load(body)
         label      = switch name
-                      when 'bleach', 'one-piece'
+                      when 'bleach', 'one-piece', 'naruto'
                            $('a.tips').first().text().trim()
                       else $('div.detail_list span.left a.color_0077').first().text().trim()
         labelNum   = ~~(_.last(label.split(' ')))
