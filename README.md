@@ -2,7 +2,7 @@ Manga Fetcher fetches and downloads manga images to your machine!
 
 ### Requirements
 
-- Node.js (developed and tested with v0.11.5)
+- Node.js (developed and tested with v0.10.21 and v0.11.5)
 - CoffeeScript
 
 ### Installation
