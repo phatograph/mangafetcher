@@ -1,5 +1,6 @@
 {
   "name": "mangafetcher",
+  "preferGlobal": true,
   "version": "1.2.0",
   "description": "Manga downloader/fetcher for devs",
   "main": "app.coffee",
@@ -27,5 +28,11 @@
   },
   "bin": {
     "mangafetcher": "bin/mangafetcher"
+  },
+  "keywords": {
+    "manga",
+    "cli",
+    "tools",
+    "http"
   }
 }
