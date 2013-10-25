@@ -29,10 +29,13 @@
   "bin": {
     "mangafetcher": "bin/mangafetcher"
   },
-  "keywords": {
+  "keywords": [
     "manga",
     "cli",
     "tools",
     "http"
+  ],
+  "engines": {
+    "node" : ">=0.10.21"
   }
 }
