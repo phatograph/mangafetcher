@@ -26,7 +26,7 @@ If the folder doesn't exist, it would be automatically created.
 - Bleach
   - `mangafetcher -m bleach -v 44 -e 386`
 
-- Shaman
+- Shaman King
   - `mangafetcher -m sk -v 33 -e 292`
 
 - Shaman King Flowers

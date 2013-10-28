@@ -13,7 +13,7 @@ clc     = require('cli-color')
 program
   .version('0.0.1')
   .usage('-m [manga ex. bleach] -v [volume ex. 30] -e [episode ex. 268]')
-  .option('-m, --manga <value>', 'Specify manga, currently available are [bleach, sk, sk-f, nisekoi, denpa-kyoushi, trinity-seven]')
+  .option('-m, --manga <value>', 'Specify manga, view manga list on https://github.com/phatograph/mangafetcher#currently-supported-manga')
   .option('-v, --volume <n>', 'Specify volume')
   .option('-e, --episode <n>', 'Specify episode')
   .option('-p, --pages [items]', 'Specify pages (optional) e.g. -p 2,4,5', (val) -> val.split(','))
@@ -42,8 +42,12 @@ mangaUrls =
 padding = (value, length) ->
   String(('0' for i in [0...length]).join('') + value).slice(length * -1)
 
+createFolder = (folderPath) ->
+  for path in folderPath.split '/'
+    initPath = "#{initPath || '.'}/#{path}"
+    fs.mkdirSync(initPath) unless fs.existsSync(initPath)
+
 mangaDownload = (vol, ep) ->
-  now = new Date()
   uri = switch program.manga
     when 'bleach', 'one-piece', 'naruto'
                    "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
@@ -87,21 +91,17 @@ mangaDownload = (vol, ep) ->
               request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
                 if res2.headers['content-type'] is 'image/jpeg'
                   folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
-                  for path in folderPath.split '/'
-                    initPath = "#{initPath || '.'}/#{path}"
-                    fs.mkdirSync(initPath) unless fs.existsSync(initPath)
+                  fileName   = "#{padding(i, 2)}.jpg"
+                  filePath   = "./#{folderPath}/#{fileName}"
 
-                  nowOffset = new Date(now.setMinutes(i))
-                  fileName = "#{padding(i, 2)}.jpg"
-                  filePath = "./#{folderPath}/#{fileName}"
-
+                  createFolder(folderPath)
                   request(uri: imgUri, timeout: 120 * 1000)
                     .pipe fs.createWriteStream(filePath)
                     .on 'finish', ->
                       pages.splice(pages.indexOf(i), 1)
                       exec("touch -t #{moment().format('YYYYMMDD')}#{padding(i, 4)} #{filePath}")  # Since iOS seems to sort images by created date, this should do the trick
 
-                      if pages.length == 0
+                      if pages.length is 0
                         console.log clc.green "\nDone!"
                       else if pages.length > 3
                         if (pageAmount - pages.length) % 5
