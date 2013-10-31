@@ -34,6 +34,11 @@ mangaUrls =
   'denpa-kyoushi' : "http://www.mangahere.com/manga/denpa_kyoushi"
   'trinity-seven' : "http://www.mangahere.com/manga/trinity_seven"
   'mkm'           : "http://www.mangahere.com/manga/minamoto_kun_monogatari"
+  'to-love-ru-d'  : "http://www.mangahere.com/manga/to_love_ru_darkness"
+  'shokugeki'     : "http://www.mangahere.com/manga/shokugeki_no_soma"
+  'shinmai'       : "http://www.mangahere.com/manga/shinmai_maou_no_keiyakusha"
+  'masamune'      : "http://www.mangahere.com/manga/masamune_kun_no_revenge"
+  'eyeshield21'   : "http://www.mangahere.com/manga/eyeshield_21"
 
 ##############################################################################
 # Image Downloading Functions
@@ -48,11 +53,17 @@ createFolder = (folderPath) ->
     fs.mkdirSync(initPath) unless fs.existsSync(initPath)
 
 mangaDownload = (vol, ep) ->
+  fraction = if ep.match /\./ then _.last(ep.split('.')) else false
+  ep       = ep.split('.')[0]
+
   uri = switch program.manga
     when 'bleach', 'one-piece', 'naruto'
-                   "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
-    when 'sk' then "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
-    else           "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}"
+         "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
+    when 'sk'
+         "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
+    else "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
+
+  console.log uri
 
   request uri: uri, (err, res, body) ->
     if err or res.statusCode isnt 200
@@ -74,6 +85,7 @@ mangaDownload = (vol, ep) ->
           $$        = cheerio.load(body)
           paddedVol = padding(vol, 3)
           paddedEp  = padding(ep, 3)
+          paddedEp += ".#{fraction}" if fraction
 
           if err or res.statusCode isnt 200
             pages.splice(pages.indexOf(i), 1)
