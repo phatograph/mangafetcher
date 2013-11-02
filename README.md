@@ -26,6 +26,9 @@ If the folder doesn't exist, it would be automatically created.
 - Bleach
   - `mangafetcher -m bleach -v 44 -e 386`
 
+- Eyeshield 21
+  - `mangafetcher -m eyeshield21 -e 1`
+
 - Shaman King
   - `mangafetcher -m sk -v 33 -e 292`
 
@@ -38,7 +41,9 @@ If the folder doesn't exist, it would be automatically created.
 - Trinity Seven
   - `mangafetcher -m trinity-seven -e 1`
 
-### List mode
+### Modes
+
+##### List mode
 
 If you already downloaded some manga and want to check for updates.
 You could run `mangafetcher -l` to check them.
@@ -50,6 +55,16 @@ Trinity Seven 32 (local: 4/32)
 Nisekoi (KOMI Naoshi) 95 (local: 95/95)
 Denpa Kyoushi 92 (local: 59/92)
 Bleach 553 (local: 259/553)
+```
+
+##### Multiple episodes mode
+
+For convenient, since v.1.4 Manga Fetcher is able to queue and download
+multiple episodes at once. Using `-e` option with `[x..y]` range
+would download from episode 201 to 210.
+
+``` bash
+$ mangefetcher -m eyeshield21 -e 201..210
 ```
 
 All manga credits to [mangahere.com](http://mangahere.com) and [mangafox.me](http://mangafox.me)!
