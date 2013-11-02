@@ -61,7 +61,7 @@ Bleach 553 (local: 259/553)
 
 For convenient, since v.1.4 Manga Fetcher is able to queue and download
 multiple episodes at once. Using `-e` option with `[x..y]` range
-would download from episode 201 to 210.
+would download from episode x to y.
 
 ``` bash
 $ mangefetcher -m eyeshield21 -e 201..210
