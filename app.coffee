@@ -1,4 +1,4 @@
-#!/usr/bin/env coffee
+#!/usr/bin/env node_modules/coffee-script/bin/coffee
 
 fs      = require('fs')
 request = require('request')
@@ -15,7 +15,7 @@ program
   .usage('-m [manga ex. bleach] -v [volume ex. 30] -e [episode ex. 268]')
   .option('-m, --manga <value>', 'Specify manga, view manga list on https://github.com/phatograph/mangafetcher#currently-supported-manga')
   .option('-v, --volume <n>', 'Specify volume')
-  .option('-e, --episode <n>', 'Specify episode')
+  .option('-e, --episode <a>..<b>', 'Specify episode', (val) -> val.split('..').map(Number))
   .option('-p, --pages [items]', 'Specify pages (optional) e.g. -p 2,4,5', (val) -> val.split(','))
   .option('-l, --list', 'List mode')
   .parse(process.argv)
@@ -114,14 +114,14 @@ mangaDownload = (vol, ep) ->
                       exec("touch -t #{moment().format('YYYYMMDD')}#{padding(i, 4)} #{filePath}")  # Since iOS seems to sort images by created date, this should do the trick
 
                       if pages.length is 0
-                        console.log clc.green "\nDone!"
+                        console.log clc.green "\nDone ##{ep}!"
                       else if pages.length > 3
                         if (pageAmount - pages.length) % 5
                           process.stdout.write "."
                         else
                           process.stdout.write "#{pageAmount - pages.length}"
                       else
-                        process.stdout.write "\nRemaining: #{pages.join(', ')}" if pages.length
+                        process.stdout.write "\nRemaining (##{ep}): #{pages.join(', ')}" if pages.length
 
 mangaList = ->
   for name, url of mangaUrls
@@ -149,6 +149,8 @@ mangaList = ->
 
 if program.list then mangaList()
 else if program.manga and program.episode
-  mangaDownload(program.volume || 0, program.episode)
+  episodes =  [program.episode[0]..(program.episode[1] || program.episode[0])]
+  for ep in episodes
+    mangaDownload(program.volume || 0, ep.toString())
 else
   console.log 'Error: please specify manga, volume and episode'
