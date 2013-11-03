@@ -60,7 +60,7 @@ Bleach 553 (local: 259/553)
 ##### Multiple episodes mode
 
 For convenient, since v.1.4 Manga Fetcher is able to queue and download
-multiple episodes at once. Using `-e` option with `[x..y]` range
+multiple episodes at once. Using `-e` option with `x..y` range
 would download from episode x to y.
 
 ``` bash
