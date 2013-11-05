@@ -1,3 +1,4 @@
-#!/usr/bin/env coffee
+#!/usr/bin/env node
 
-require '../app'
+require('coffee-script')
+require('../app')
