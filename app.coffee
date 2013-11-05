@@ -39,6 +39,7 @@ mangaUrls =
   'shinmai'       : "http://www.mangahere.com/manga/shinmai_maou_no_keiyakusha"
   'masamune'      : "http://www.mangahere.com/manga/masamune_kun_no_revenge"
   'eyeshield21'   : "http://www.mangahere.com/manga/eyeshield_21"
+  'gundam-origin' : "http://www.mangahere.com/manga/mobile_suit_gundam_the_origin"
 
 ##############################################################################
 # Image Downloading Functions
@@ -61,6 +62,8 @@ mangaDownload = (vol, ep) ->
          "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
     when 'sk'
          "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
+    when 'gundam-origin'
+         "#{mangaUrls[program.manga]}/v#{padding(vol, 2)}/c#{padding(ep, 3)}"
     else "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
 
   console.log uri
@@ -103,7 +106,7 @@ mangaDownload = (vol, ep) ->
               request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
                 if res2.headers['content-type'] is 'image/jpeg'
                   folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
-                  fileName   = "#{padding(i, 2)}.jpg"
+                  fileName   = "#{padding(i, 3)}.jpg"
                   filePath   = "./#{folderPath}/#{fileName}"
 
                   createFolder(folderPath)
@@ -111,7 +114,10 @@ mangaDownload = (vol, ep) ->
                     .pipe fs.createWriteStream(filePath)
                     .on 'finish', ->
                       pages.splice(pages.indexOf(i), 1)
-                      exec("touch -t #{moment().format('YYYYMMDD')}#{padding(i, 4)} #{filePath}")  # Since iOS seems to sort images by created date, this should do the trick
+
+                      # Since iOS seems to sort images by created date, this should do the trick.
+                      # Also rounds this by 60 (minutes)
+                      exec("touch -t #{moment().format('YYYYMMDD')}#{padding(~~(i / 60), 2)}#{padding(i % 60, 2)} #{filePath}")
 
                       if pages.length is 0
                         console.log clc.green "\nDone ##{ep}!"
