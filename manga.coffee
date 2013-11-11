@@ -15,3 +15,5 @@ module.exports = do ->
   'eyeshield21'   : 'http://www.mangahere.com/manga/eyeshield_21'
   'gundam-origin' : 'http://www.mangahere.com/manga/mobile_suit_gundam_the_origin'
   'fate-extra'    : 'http://www.mangahere.com/manga/fate_extra'
+  'mahoromatic-1'   : 'http://www.mangahere.com/manga/mahoromatic'
+  'mahoromatic-2'   : 'http://www.mangahere.com/manga/mahoromatic'

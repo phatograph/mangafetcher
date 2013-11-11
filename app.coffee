@@ -47,8 +47,8 @@ mangaDownload = (vol, ep) ->
          "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
     when 'sk'
          "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
-    when 'gundam-origin'
-         "#{mangaUrls[program.manga]}/v#{padding(vol, 2)}/c#{padding(ep, 3)}"
+    when 'gundam-origin', 'mahoromatic-2'
+         "#{mangaUrls[program.manga]}/v#{padding(vol, 2)}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
     else "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
 
   console.log uri
