@@ -19,6 +19,7 @@ program
   .option('-e, --episode <a>..<b>', 'Specify episode', (val) -> val.split('..').map(Number))
   .option('-p, --pages [items]', 'Specify pages (optional) e.g. -p 2,4,5', (val) -> val.split(','))
   .option('-l, --list', 'List mode')
+  .option('-x, --eplist', 'Episode List mode')
   .parse(process.argv)
 
 ##############################################################################
@@ -47,7 +48,7 @@ mangaDownload = (vol, ep) ->
          "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
     when 'sk'
          "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
-    when 'gundam-origin', 'mahoromatic-2'
+    when 'gundam-origin', 'mahoromatic-2', 'tsubasa'
          "#{mangaUrls[program.manga]}/v#{padding(vol, 2)}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
     else "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
 
@@ -60,7 +61,7 @@ mangaDownload = (vol, ep) ->
 
     $ = cheerio.load(body)
     pageAmount = switch program.manga
-      when 'bleach', 'one-piece', 'naruto'
+      when 'bleach', 'one-piece', 'naruto'  # for mangafoxes
             $('form#top_bar select.m option').length
       else  $('section.readpage_top select.wid60 option').length
     pages = program.pages || [0..pageAmount]
@@ -134,11 +135,25 @@ mangaList = ->
 
             console.log "#{label} [#{clc.yellow name}] (local: #{color(latestFolder || '-')}/#{labelNum})"
 
+episodeList = ->
+  unless program.manga
+    console.log 'Error: please specify manga'
+    return
+
+  request uri: "#{mangaUrls[program.manga]}/", followRedirect: false, (err, res, body) ->
+    $ = cheerio.load(body)
+    $('div.detail_list ul span.left').each (i, l) ->
+      text = @parent().text().trim()
+        .replace(/\r?\n|\r|\t/g, '')
+        .replace(/\s{2,}/g, ' | ')
+      console.log text
+
 ##############################################################################
 # App Kickoff!
 ##############################################################################
 
 if program.list then mangaList()
+else if program.eplist then episodeList()
 else if program.manga and program.episode
   episodes =  [program.episode[0]..(program.episode[1] || program.episode[0])]
   for ep in episodes
