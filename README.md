@@ -59,6 +59,25 @@ Denpa Kyoushi 92 (local: 59/92)
 Bleach 553 (local: 259/553)
 ```
 
+##### Episode List mode
+
+Some mangas must have both volume and episode specified. And some of their
+volume/episode combination is quite hard to remember. Using this mode
+would quickly display this information. For example this displays a
+list of Tsubasa episodes.
+
+```
+$ mangafetcher -x -m tsubasa
+Captain Tsubasa 114 | Vol 37 | Nov 19, 2007
+Captain Tsubasa 113 | Vol 37 | Nov 19, 2007
+Captain Tsubasa 112 | Vol 37 | Nov 19, 2007
+Captain Tsubasa 111 | Vol 37 | Nov 19, 2007
+Captain Tsubasa 110 | Vol 37 | Nov 19, 2007
+Captain Tsubasa 109 | Vol 36 | Nov 19, 2007
+Captain Tsubasa 108 | Vol 36 | Nov 19, 2007
+...
+```
+
 ##### Multiple episodes mode
 
 For convenient, since v.1.4 Manga Fetcher is able to queue and download
@@ -68,5 +87,6 @@ would download from episode x to y.
 ``` bash
 $ mangefetcher -m eyeshield21 -e 201..210
 ```
+
 
 All manga credits to [mangahere.com](http://mangahere.com) and [mangafox.me](http://mangafox.me)!
