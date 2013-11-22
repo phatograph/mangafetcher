@@ -76,6 +76,8 @@ Captain Tsubasa 110 | Vol 37 | Nov 19, 2007
 Captain Tsubasa 109 | Vol 36 | Nov 19, 2007
 Captain Tsubasa 108 | Vol 36 | Nov 19, 2007
 ...
+
+$ mf -m tsubasa -v 37 -e 114
 ```
 
 ##### Multiple episodes mode
