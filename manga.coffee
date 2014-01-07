@@ -19,3 +19,5 @@ module.exports = do ->
   'mahoromatic-2'  : 'http://www.mangahere.com/manga/mahoromatic'
   'monster-musume' : 'http://www.mangahere.com/manga/monster_musume_no_iru_nichijou'
   'tsubasa'        : 'http://www.mangahere.com/manga/captain_tsubasa'
+  'pot'            : 'http://www.mangahere.com/manga/prince_of_tennis'
+  'yugi'           : 'http://www.mangahere.com/manga/yu_gi_oh'

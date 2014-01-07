@@ -44,7 +44,7 @@ mangaDownload = (vol, ep) ->
   ep       = ep.split('.')[0]
 
   uri = switch program.manga
-    when 'bleach', 'one-piece', 'naruto'
+    when 'bleach', 'one-piece', 'naruto', 'yugi'
          "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
     when 'sk'
          "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
