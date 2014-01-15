@@ -21,3 +21,4 @@ module.exports = do ->
   'tsubasa'        : 'http://www.mangahere.com/manga/captain_tsubasa'
   'pot'            : 'http://www.mangahere.com/manga/prince_of_tennis'
   'yugi'           : 'http://www.mangahere.com/manga/yu_gi_oh'
+  'yugi-d'         : 'http://www.mangahere.com/manga/yu_gi_oh_duelist'

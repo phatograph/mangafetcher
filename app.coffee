@@ -20,6 +20,7 @@ program
   .option('-p, --pages [items]', 'Specify pages (optional) e.g. -p 2,4,5', (val) -> val.split(','))
   .option('-l, --list', 'List mode')
   .option('-x, --eplist', 'Episode List mode')
+  .option('-r, --rerender <value>', 'Rerender mode (for mangahere)')
   .parse(process.argv)
 
 ##############################################################################
@@ -44,7 +45,7 @@ mangaDownload = (vol, ep) ->
   ep       = ep.split('.')[0]
 
   uri = switch program.manga
-    when 'bleach', 'one-piece', 'naruto', 'yugi'
+    when 'bleach', 'one-piece', 'naruto', 'yugi', 'yugi-d'
          "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
     when 'sk'
          "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
@@ -88,6 +89,12 @@ mangaDownload = (vol, ep) ->
                 when 'bleach', 'one-piece', 'naruto'
                      img.attr('onerror').match(/http.+jpg/)[0]  # New manga seems to fallback to another CDN
                 else img.attr('src')
+
+              # Rerender mode for mangahere
+              imgUri = switch program.rerender
+                when '0' then imgUri.replace(/.\.mhcdn\.net/, 'm.mhcdn.net')
+                when '1' then imgUri.replace(/.\.mhcdn\.net/, 's.mangahere.com')
+                else          imgUri
 
               request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
                 if res2.headers['content-type'] is 'image/jpeg'
