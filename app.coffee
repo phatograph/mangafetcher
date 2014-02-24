@@ -44,14 +44,11 @@ mangaDownload = (vol, ep) ->
   fraction = if ep.match /\./ then _.last(ep.split('.')) else false
   ep       = ep.split('.')[0]
 
-  uri = switch program.manga
-    when 'bleach', 'one-piece', 'naruto', 'yugi', 'yugi-d'
-         "#{mangaUrls[program.manga]}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
-    when 'sk'
-         "#{mangaUrls[program.manga]}/v#{vol}/c#{ep}"
-    when 'gundam-origin', 'mahoromatic-2', 'tsubasa'
-         "#{mangaUrls[program.manga]}/v#{padding(vol, 2)}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
-    else "#{mangaUrls[program.manga]}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
+  uri = switch mangaUrls[program.manga].format
+        when 1 then "#{mangaUrls[program.manga].url}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
+        when 2 then "#{mangaUrls[program.manga].url}/v#{vol}/c#{ep}"
+        when 3 then "#{mangaUrls[program.manga].url}/v#{padding(vol, 2)}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
+        else        "#{mangaUrls[program.manga].url}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
 
   console.log uri
 
@@ -61,10 +58,11 @@ mangaDownload = (vol, ep) ->
       return false
 
     $ = cheerio.load(body)
-    pageAmount = switch program.manga
-      when 'bleach', 'one-piece', 'naruto'  # for mangafoxes
-            $('form#top_bar select.m option').length
-      else  $('section.readpage_top select.wid60 option').length
+    host = mangaUrls[program.manga].url.match(/http:\/\/[.\w\d]+\//) || []
+    host = host[0]
+    pageAmount = switch host
+                 when 'http://mangafox.me/' then $('form#top_bar select.m option').length  # for mangafoxes
+                 else                       $('section.readpage_top select.wid60 option').length
     pages = program.pages || [0..pageAmount]
     uri = uri.slice(0, -1) if uri.match /\/$/  # Remove trailing `/`
 
@@ -85,16 +83,15 @@ mangaDownload = (vol, ep) ->
             unless img.length
               pages.splice(pages.indexOf(i), 1)
             else
-              imgUri = switch program.manga
-                when 'bleach', 'one-piece', 'naruto'
-                     img.attr('onerror').match(/http.+jpg/)[0]  # New manga seems to fallback to another CDN
-                else img.attr('src')
+              imgUri = switch host
+                       when 'http://mangafox.me/' then img.attr('onerror').match(/http.+jpg/)[0]  # New manga seems to fallback to another CDN
+                       else                            img.attr('src')
 
               # Rerender mode for mangahere
               imgUri = switch program.rerender
-                when '0' then imgUri.replace(/.\.mhcdn\.net/, 'm.mhcdn.net')
-                when '1' then imgUri.replace(/.\.mhcdn\.net/, 's.mangahere.com')
-                else          imgUri
+                       when '0' then imgUri.replace(/.\.mhcdn\.net/, 'm.mhcdn.net')
+                       when '1' then imgUri.replace(/.\.mhcdn\.net/, 's.mangahere.com')
+                       else          imgUri
 
               request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
                 if res2.headers['content-type'] is 'image/jpeg'
@@ -125,12 +122,14 @@ mangaDownload = (vol, ep) ->
 mangaList = ->
   for name, url of mangaUrls
     do (name, url) ->
-      request uri: "#{mangaUrls[name]}/", followRedirect: false, (err, res, body) ->
+      host = mangaUrls[name].url.match(/http:\/\/[.\w\d]+\//) || []
+      host = host[0]
+
+      request uri: "#{mangaUrls[name].url}/", followRedirect: false, (err, res, body) ->
         $          = cheerio.load(body)
-        label      = switch name
-                      when 'bleach', 'one-piece', 'naruto'
-                           $('a.tips').first().text().trim()
-                      else $('div.detail_list span.left a.color_0077').first().text().trim()
+        label      = switch host
+                     when 'http://mangafox.me/' then $('a.tips').first().text().trim()
+                     else                            $('div.detail_list span.left a.color_0077').first().text().trim()
         labelNum   = ~~(_.last(label.split(' ')))
         folderPath = "./manga/#{name}"
 
