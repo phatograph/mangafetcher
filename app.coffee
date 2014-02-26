@@ -28,8 +28,8 @@ program
 ##############################################################################
 
 # Shared variables
-pages = undefined
-pageAmount = undefined
+pages = {}
+pageAmount = {}
 
 padding = (value, length) ->
   String(('0' for i in [0...length]).join('') + value).slice(length * -1)
@@ -39,7 +39,7 @@ createFolder = (folderPath) ->
     initPath = "#{initPath || '.'}/#{path}"
     fs.mkdirSync(initPath) unless fs.existsSync(initPath)
 
-imageDownload = (imgUri, i, paddedVol, paddedEp) ->
+imageDownload = (imgUri, i, paddedVol, paddedEp, ep) ->
   request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
     if err2 or res2.statusCode isnt 200
       console.log clc.red "Oops, something went wrong. Error: #{err2}"
@@ -53,21 +53,21 @@ imageDownload = (imgUri, i, paddedVol, paddedEp) ->
       request(uri: imgUri, timeout: 120 * 1000)
         .pipe fs.createWriteStream(filePath)
         .on 'finish', ->
-          pages.splice(pages.indexOf(i), 1)
+          pages[ep].splice(pages[ep].indexOf(i), 1)
 
           # Since iOS seems to sort images by created date, this should do the trick.
           # Also rounds this by 60 (minutes)
           exec("touch -t #{moment().format('YYYYMMDD')}#{padding(~~(i / 60), 2)}#{padding(i % 60, 2)} #{filePath}")
 
-          if pages.length is 0
+          if pages[ep].length is 0
             console.log clc.green "\nDone ##{ep}!"
-          else if pages.length > 3
-            if (pageAmount - pages.length) % 5
+          else if pages[ep].length > 3
+            if (pageAmount[ep] - pages[ep].length) % 5
               process.stdout.write "."
             else
-              process.stdout.write "#{pageAmount - pages.length}"
+              process.stdout.write "#{pageAmount[ep] - pages[ep].length}"
           else
-            process.stdout.write "\nRemaining (##{ep}): #{pages.join(', ')}" if pages.length
+            process.stdout.write "\nRemaining (##{ep}): #{pages[ep].join(', ')}" if pages[ep].length
 
 mangaDownload = (vol, ep) ->
   fraction  = if ep.match /\./ then _.last(ep.split('.')) else false
@@ -96,31 +96,31 @@ mangaDownload = (vol, ep) ->
     # Tap-in for mangapark.com
     if host is 'http://www.mangapark.com/'
       imgs = $('img.img')
-      pages = imgs.map (i) -> i
-      pageAmount = pages.length
-      imgs.each (i) -> imageDownload @attr('src'), i, paddedVol, paddedEp
+      pages[ep] = imgs.map (i) -> i
+      pageAmount[ep] = pages[ep].length
+      imgs.each (i) -> imageDownload @attr('src'), i, paddedVol, paddedEp, ep
 
     # Other sites
     else
-      pageAmount = switch host
+      pageAmount[ep] = switch host
                    when 'http://mangafox.me/' then $('form#top_bar select.m option').length
                    else                            $('section.readpage_top select.wid60 option').length
-      pages = program.pages || [0..pageAmount]
+      pages[ep] = program.pages || [0..pageAmount[ep]]
       # uri = uri.slice(0, -1) if uri.match /\/$/  # Remove trailing `/`
 
-      console.log clc.green "Downloading up to #{pages.length} page(s)"
-      for i in _.clone pages
+      console.log clc.green "Downloading up to #{pages[ep].length} page(s)"
+      for i in _.clone pages[ep]
         do (i) ->
           request uri: "#{uri}#{ if i > 1 then i + '.html' else ''  }", followRedirect: false, (err, res, body) ->
             $$ = cheerio.load(body)
 
             if err or res.statusCode isnt 200
-              pages.splice(pages.indexOf(i), 1)
+              pages[ep].splice(pages[ep].indexOf(i), 1)
             else
               img = $$('img#image')
 
               unless img.length
-                pages.splice(pages.indexOf(i), 1)
+                pages[ep].splice(pages[ep].indexOf(i), 1)
               else
                 imgUri = switch host
                          when 'http://mangafox.me/' then img.attr('onerror').match(/http.+jpg/)[0]  # New manga seems to fallback to another CDN
@@ -134,7 +134,7 @@ mangaDownload = (vol, ep) ->
                          else          imgUri
 
                 console.log imgUri if program.pages
-                imageDownload imgUri, i, paddedVol, paddedEp
+                imageDownload imgUri, i, paddedVol, paddedEp, ep
 
 mangaList = ->
   for name, url of mangaUrls
