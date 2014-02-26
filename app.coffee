@@ -28,8 +28,10 @@ program
 ##############################################################################
 
 # Shared variables
-pages = {}
+pages      = {}
 pageAmount = {}
+host       = mangaUrls[program.manga].url.match(/http:\/\/[.\w\d]+\//) || []
+host       = host[0]
 
 padding = (value, length) ->
   String(('0' for i in [0...length]).join('') + value).slice(length * -1)
@@ -47,6 +49,7 @@ imageDownload = (imgUri, i, paddedVol, paddedEp, ep) ->
     if res2.headers['content-type'] is 'image/jpeg'
       folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
       fileName   = "#{padding(i, 3)}.jpg"
+      fileName   = "#{program.pages}-#{fileName}" if host is 'http://www.mangapark.com/' and program.pages
       filePath   = "./#{folderPath}/#{fileName}"
 
       createFolder(folderPath)
@@ -76,15 +79,17 @@ mangaDownload = (vol, ep) ->
               when 1 then "#{mangaUrls[program.manga].url}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
               when 2 then "#{mangaUrls[program.manga].url}/v#{vol}/c#{ep}/"
               when 3 then "#{mangaUrls[program.manga].url}/v#{padding(vol, 2)}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}/"
-              when 4 then "#{mangaUrls[program.manga].url}/c#{ep}/all"
+              when 4 then "#{mangaUrls[program.manga].url}/c#{ep}/"
               else        "#{mangaUrls[program.manga].url}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}/"
-  host      = mangaUrls[program.manga].url.match(/http:\/\/[.\w\d]+\//) || []
-  host      = host[0]
   paddedVol = padding(vol, 3)
   paddedEp  = padding(ep, 3)
   paddedEp += ".#{fraction}" if fraction
 
-  console.log uri
+  if host is 'http://www.mangapark.com/'
+    if program.pages
+      uri += "10-#{program.pages}"
+    else
+      uri += 'all'
 
   request uri: uri, (err, res, body) ->
     if err or res.statusCode isnt 200
@@ -95,8 +100,8 @@ mangaDownload = (vol, ep) ->
 
     # Tap-in for mangapark.com
     if host is 'http://www.mangapark.com/'
-      imgs = $('img.img')
-      pages[ep] = imgs.map (i) -> i
+      imgs           = $('img.img')
+      pages[ep]      = imgs.map (i) -> i
       pageAmount[ep] = pages[ep].length
       imgs.each (i) -> imageDownload @attr('src'), i, paddedVol, paddedEp, ep
 
