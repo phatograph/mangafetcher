@@ -24,13 +24,12 @@ program
   .parse(process.argv)
 
 ##############################################################################
-# Manga Urls
-##############################################################################
-
-
-##############################################################################
 # Image Downloading Functions
 ##############################################################################
+
+# Shared variables
+pages = undefined
+pageAmount = undefined
 
 padding = (value, length) ->
   String(('0' for i in [0...length]).join('') + value).slice(length * -1)
@@ -40,15 +39,45 @@ createFolder = (folderPath) ->
     initPath = "#{initPath || '.'}/#{path}"
     fs.mkdirSync(initPath) unless fs.existsSync(initPath)
 
+imageDownload = (imgUri, i, paddedVol, paddedEp) ->
+  request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
+    if err2 or res2.statusCode isnt 200
+      console.log clc.red "Oops, something went wrong. Error: #{err2}"
+      return false
+    if res2.headers['content-type'] is 'image/jpeg'
+      folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
+      fileName   = "#{padding(i, 3)}.jpg"
+      filePath   = "./#{folderPath}/#{fileName}"
+
+      createFolder(folderPath)
+      request(uri: imgUri, timeout: 120 * 1000)
+        .pipe fs.createWriteStream(filePath)
+        .on 'finish', ->
+          pages.splice(pages.indexOf(i), 1)
+
+          # Since iOS seems to sort images by created date, this should do the trick.
+          # Also rounds this by 60 (minutes)
+          exec("touch -t #{moment().format('YYYYMMDD')}#{padding(~~(i / 60), 2)}#{padding(i % 60, 2)} #{filePath}")
+
+          if pages.length is 0
+            console.log clc.green "\nDone ##{ep}!"
+          else if pages.length > 3
+            if (pageAmount - pages.length) % 5
+              process.stdout.write "."
+            else
+              process.stdout.write "#{pageAmount - pages.length}"
+          else
+            process.stdout.write "\nRemaining (##{ep}): #{pages.join(', ')}" if pages.length
+
 mangaDownload = (vol, ep) ->
   fraction  = if ep.match /\./ then _.last(ep.split('.')) else false
   ep        = ep.split('.')[0]
   uri       = switch mangaUrls[program.manga].format
               when 1 then "#{mangaUrls[program.manga].url}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
-              when 2 then "#{mangaUrls[program.manga].url}/v#{vol}/c#{ep}"
-              when 3 then "#{mangaUrls[program.manga].url}/v#{padding(vol, 2)}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
+              when 2 then "#{mangaUrls[program.manga].url}/v#{vol}/c#{ep}/"
+              when 3 then "#{mangaUrls[program.manga].url}/v#{padding(vol, 2)}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}/"
               when 4 then "#{mangaUrls[program.manga].url}/c#{ep}/all"
-              else        "#{mangaUrls[program.manga].url}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
+              else        "#{mangaUrls[program.manga].url}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}/"
   host      = mangaUrls[program.manga].url.match(/http:\/\/[.\w\d]+\//) || []
   host      = host[0]
   paddedVol = padding(vol, 3)
@@ -69,47 +98,20 @@ mangaDownload = (vol, ep) ->
       imgs = $('img.img')
       pages = imgs.map (i) -> i
       pageAmount = pages.length
-
-      imgs.each (i) ->
-        imgUri = @attr('src')
-        request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
-          if res2.headers['content-type'] is 'image/jpeg'
-            folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
-            fileName   = "#{padding(i, 3)}.jpg"
-            filePath   = "./#{folderPath}/#{fileName}"
-
-            createFolder(folderPath)
-            request(uri: imgUri, timeout: 120 * 1000)
-              .pipe fs.createWriteStream(filePath)
-              .on 'finish', ->
-                pages.splice(pages.indexOf(i), 1)
-
-                # Since iOS seems to sort images by created date, this should do the trick.
-                # Also rounds this by 60 (minutes)
-                exec("touch -t #{moment().format('YYYYMMDD')}#{padding(~~(i / 60), 2)}#{padding(i % 60, 2)} #{filePath}")
-
-                if pages.length is 0
-                  console.log clc.green "\nDone ##{ep}!"
-                else if pages.length > 3
-                  if (pageAmount - pages.length) % 5
-                    process.stdout.write "."
-                  else
-                    process.stdout.write "#{pageAmount - pages.length}"
-                else
-                  process.stdout.write "\nRemaining (##{ep}): #{pages.join(', ')}" if pages.length
+      imgs.each (i) -> imageDownload @attr('src'), i, paddedVol, paddedEp
 
     # Other sites
     else
       pageAmount = switch host
-                   when 'http://mangafox.me/' then       $('form#top_bar select.m option').length
-                   else                                  $('section.readpage_top select.wid60 option').length
+                   when 'http://mangafox.me/' then $('form#top_bar select.m option').length
+                   else                            $('section.readpage_top select.wid60 option').length
       pages = program.pages || [0..pageAmount]
-      uri = uri.slice(0, -1) if uri.match /\/$/  # Remove trailing `/`
+      # uri = uri.slice(0, -1) if uri.match /\/$/  # Remove trailing `/`
 
       console.log clc.green "Downloading up to #{pages.length} page(s)"
       for i in _.clone pages
         do (i) ->
-          request uri: "#{uri}/#{i}.html", followRedirect: false, (err, res, body) ->
+          request uri: "#{uri}#{ if i > 1 then i + '.html' else ''  }", followRedirect: false, (err, res, body) ->
             $$ = cheerio.load(body)
 
             if err or res.statusCode isnt 200
@@ -132,32 +134,7 @@ mangaDownload = (vol, ep) ->
                          else          imgUri
 
                 console.log imgUri if program.pages
-
-                request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
-                  if res2.headers['content-type'] is 'image/jpeg'
-                    folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
-                    fileName   = "#{padding(i, 3)}.jpg"
-                    filePath   = "./#{folderPath}/#{fileName}"
-
-                    createFolder(folderPath)
-                    request(uri: imgUri, timeout: 120 * 1000)
-                      .pipe fs.createWriteStream(filePath)
-                      .on 'finish', ->
-                        pages.splice(pages.indexOf(i), 1)
-
-                        # Since iOS seems to sort images by created date, this should do the trick.
-                        # Also rounds this by 60 (minutes)
-                        exec("touch -t #{moment().format('YYYYMMDD')}#{padding(~~(i / 60), 2)}#{padding(i % 60, 2)} #{filePath}")
-
-                        if pages.length is 0
-                          console.log clc.green "\nDone ##{ep}!"
-                        else if pages.length > 3
-                          if (pageAmount - pages.length) % 5
-                            process.stdout.write "."
-                          else
-                            process.stdout.write "#{pageAmount - pages.length}"
-                        else
-                          process.stdout.write "\nRemaining (##{ep}): #{pages.join(', ')}" if pages.length
+                imageDownload imgUri, i, paddedVol, paddedEp
 
 mangaList = ->
   for name, url of mangaUrls
