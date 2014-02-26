@@ -41,14 +41,19 @@ createFolder = (folderPath) ->
     fs.mkdirSync(initPath) unless fs.existsSync(initPath)
 
 mangaDownload = (vol, ep) ->
-  fraction = if ep.match /\./ then _.last(ep.split('.')) else false
-  ep       = ep.split('.')[0]
-
-  uri = switch mangaUrls[program.manga].format
-        when 1 then "#{mangaUrls[program.manga].url}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
-        when 2 then "#{mangaUrls[program.manga].url}/v#{vol}/c#{ep}"
-        when 3 then "#{mangaUrls[program.manga].url}/v#{padding(vol, 2)}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
-        else        "#{mangaUrls[program.manga].url}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
+  fraction  = if ep.match /\./ then _.last(ep.split('.')) else false
+  ep        = ep.split('.')[0]
+  uri       = switch mangaUrls[program.manga].format
+              when 1 then "#{mangaUrls[program.manga].url}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
+              when 2 then "#{mangaUrls[program.manga].url}/v#{vol}/c#{ep}"
+              when 3 then "#{mangaUrls[program.manga].url}/v#{padding(vol, 2)}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
+              when 4 then "#{mangaUrls[program.manga].url}/c#{ep}/all"
+              else        "#{mangaUrls[program.manga].url}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}"
+  host      = mangaUrls[program.manga].url.match(/http:\/\/[.\w\d]+\//) || []
+  host      = host[0]
+  paddedVol = padding(vol, 3)
+  paddedEp  = padding(ep, 3)
+  paddedEp += ".#{fraction}" if fraction
 
   console.log uri
 
@@ -58,66 +63,101 @@ mangaDownload = (vol, ep) ->
       return false
 
     $ = cheerio.load(body)
-    host = mangaUrls[program.manga].url.match(/http:\/\/[.\w\d]+\//) || []
-    host = host[0]
-    pageAmount = switch host
-                 when 'http://mangafox.me/' then $('form#top_bar select.m option').length  # for mangafoxes
-                 else                       $('section.readpage_top select.wid60 option').length
-    pages = program.pages || [0..pageAmount]
-    uri = uri.slice(0, -1) if uri.match /\/$/  # Remove trailing `/`
 
-    console.log clc.green "Downloading up to #{pages.length} page(s)"
-    for i in _.clone pages
-      do (i) ->
-        request uri: "#{uri}/#{i}.html", followRedirect: false, (err, res, body) ->
-          $$        = cheerio.load(body)
-          paddedVol = padding(vol, 3)
-          paddedEp  = padding(ep, 3)
-          paddedEp += ".#{fraction}" if fraction
+    # Tap-in for mangapark.com
+    if host is 'http://www.mangapark.com/'
+      imgs = $('img.img')
+      pages = imgs.map (i) -> i
+      pageAmount = pages.length
 
-          if err or res.statusCode isnt 200
-            pages.splice(pages.indexOf(i), 1)
-          else
-            img = $$('img#image')
+      imgs.each (i) ->
+        imgUri = @attr('src')
+        request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
+          if res2.headers['content-type'] is 'image/jpeg'
+            folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
+            fileName   = "#{padding(i, 3)}.jpg"
+            filePath   = "./#{folderPath}/#{fileName}"
 
-            unless img.length
+            createFolder(folderPath)
+            request(uri: imgUri, timeout: 120 * 1000)
+              .pipe fs.createWriteStream(filePath)
+              .on 'finish', ->
+                pages.splice(pages.indexOf(i), 1)
+
+                # Since iOS seems to sort images by created date, this should do the trick.
+                # Also rounds this by 60 (minutes)
+                exec("touch -t #{moment().format('YYYYMMDD')}#{padding(~~(i / 60), 2)}#{padding(i % 60, 2)} #{filePath}")
+
+                if pages.length is 0
+                  console.log clc.green "\nDone ##{ep}!"
+                else if pages.length > 3
+                  if (pageAmount - pages.length) % 5
+                    process.stdout.write "."
+                  else
+                    process.stdout.write "#{pageAmount - pages.length}"
+                else
+                  process.stdout.write "\nRemaining (##{ep}): #{pages.join(', ')}" if pages.length
+
+    # Other sites
+    else
+      pageAmount = switch host
+                   when 'http://mangafox.me/' then       $('form#top_bar select.m option').length
+                   else                                  $('section.readpage_top select.wid60 option').length
+      pages = program.pages || [0..pageAmount]
+      uri = uri.slice(0, -1) if uri.match /\/$/  # Remove trailing `/`
+
+      console.log clc.green "Downloading up to #{pages.length} page(s)"
+      for i in _.clone pages
+        do (i) ->
+          request uri: "#{uri}/#{i}.html", followRedirect: false, (err, res, body) ->
+            $$ = cheerio.load(body)
+
+            if err or res.statusCode isnt 200
               pages.splice(pages.indexOf(i), 1)
             else
-              imgUri = switch host
-                       when 'http://mangafox.me/' then img.attr('onerror').match(/http.+jpg/)[0]  # New manga seems to fallback to another CDN
-                       else                            img.attr('src')
+              img = $$('img#image')
 
-              # Rerender mode for mangahere
-              imgUri = switch program.rerender
-                       when '0' then imgUri.replace(/.\.mhcdn\.net/, 'm.mhcdn.net')
-                       when '1' then imgUri.replace(/.\.mhcdn\.net/, 's.mangahere.com')
-                       else          imgUri
+              unless img.length
+                pages.splice(pages.indexOf(i), 1)
+              else
+                imgUri = switch host
+                         when 'http://mangafox.me/' then img.attr('onerror').match(/http.+jpg/)[0]  # New manga seems to fallback to another CDN
+                         else                            img.attr('src')
 
-              request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
-                if res2.headers['content-type'] is 'image/jpeg'
-                  folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
-                  fileName   = "#{padding(i, 3)}.jpg"
-                  filePath   = "./#{folderPath}/#{fileName}"
+                # Rerender mode for mangahere
+                imgUri = switch program.rerender
+                         when '0' then imgUri.replace(/.\.m.cdn\.net/, 'm.mhcdn.net')
+                         when '1' then imgUri.replace(/.\.m.cdn\.net/, 's.mangahere.com')
+                         when '2' then imgUri.replace(/.\.m.cdn\.net/, 'z.mfcdn.net')
+                         else          imgUri
 
-                  createFolder(folderPath)
-                  request(uri: imgUri, timeout: 120 * 1000)
-                    .pipe fs.createWriteStream(filePath)
-                    .on 'finish', ->
-                      pages.splice(pages.indexOf(i), 1)
+                console.log imgUri if program.pages
 
-                      # Since iOS seems to sort images by created date, this should do the trick.
-                      # Also rounds this by 60 (minutes)
-                      exec("touch -t #{moment().format('YYYYMMDD')}#{padding(~~(i / 60), 2)}#{padding(i % 60, 2)} #{filePath}")
+                request.head uri: imgUri, followRedirect: false, (err2, res2, body2) ->
+                  if res2.headers['content-type'] is 'image/jpeg'
+                    folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
+                    fileName   = "#{padding(i, 3)}.jpg"
+                    filePath   = "./#{folderPath}/#{fileName}"
 
-                      if pages.length is 0
-                        console.log clc.green "\nDone ##{ep}!"
-                      else if pages.length > 3
-                        if (pageAmount - pages.length) % 5
-                          process.stdout.write "."
+                    createFolder(folderPath)
+                    request(uri: imgUri, timeout: 120 * 1000)
+                      .pipe fs.createWriteStream(filePath)
+                      .on 'finish', ->
+                        pages.splice(pages.indexOf(i), 1)
+
+                        # Since iOS seems to sort images by created date, this should do the trick.
+                        # Also rounds this by 60 (minutes)
+                        exec("touch -t #{moment().format('YYYYMMDD')}#{padding(~~(i / 60), 2)}#{padding(i % 60, 2)} #{filePath}")
+
+                        if pages.length is 0
+                          console.log clc.green "\nDone ##{ep}!"
+                        else if pages.length > 3
+                          if (pageAmount - pages.length) % 5
+                            process.stdout.write "."
+                          else
+                            process.stdout.write "#{pageAmount - pages.length}"
                         else
-                          process.stdout.write "#{pageAmount - pages.length}"
-                      else
-                        process.stdout.write "\nRemaining (##{ep}): #{pages.join(', ')}" if pages.length
+                          process.stdout.write "\nRemaining (##{ep}): #{pages.join(', ')}" if pages.length
 
 mangaList = ->
   for name, url of mangaUrls
@@ -146,7 +186,7 @@ episodeList = ->
     console.log 'Error: please specify manga'
     return
 
-  request uri: "#{mangaUrls[program.manga]}/", followRedirect: false, (err, res, body) ->
+  request uri: "#{mangaUrls[program.manga].url}/", followRedirect: false, (err, res, body) ->
     $ = cheerio.load(body)
     $('div.detail_list ul span.left').each (i, l) ->
       text = @parent().text().trim()

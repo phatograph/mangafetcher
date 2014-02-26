@@ -1,5 +1,6 @@
 module.exports = do ->
   'bleach'         : url: 'http://mangafox.me/manga/bleach', format: 1
+  'bleach-mp'      : url: 'http://www.mangapark.com/manga/Bleach', format: 4
   'one_piece'      : url: 'http://mangafox.me/manga/one_piece', format: 1
   'naruto'         : url: 'http://mangafox.me/manga/naruto', format: 1
   'sk'             : url: 'http://www.mangahere.com/manga/shaman_king', format: 2
