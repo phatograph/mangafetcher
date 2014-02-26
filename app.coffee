@@ -111,7 +111,7 @@ mangaDownload = (vol, ep) ->
       console.log clc.green "Downloading up to #{pages[ep].length} page(s)"
       for i in _.clone pages[ep]
         do (i) ->
-          request uri: "#{uri}#{ if i > 1 then i + '.html' else ''  }", followRedirect: false, (err, res, body) ->
+          request uri: "#{uri}#{ if i > 0 then i + '.html' else ''  }", followRedirect: false, (err, res, body) ->
             $$ = cheerio.load(body)
 
             if err or res.statusCode isnt 200
