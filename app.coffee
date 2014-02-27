@@ -30,8 +30,8 @@ program
 # Shared variables
 pages      = {}
 pageAmount = {}
-host       = mangaUrls[program.manga].url.match(/http:\/\/[.\w\d]+\//) || []
-host       = host[0]
+host       = undefined
+host       = undefined
 
 padding = (value, length) ->
   String(('0' for i in [0...length]).join('') + value).slice(length * -1)
@@ -47,10 +47,10 @@ imageDownload = (imgUri, i, paddedVol, paddedEp, ep) ->
       console.log clc.red "Oops, something went wrong. Error: #{err2}"
       return false
     if res2.headers['content-type'] is 'image/jpeg'
-      folderPath = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
-      fileName   = "#{padding(i, 3)}.jpg"
-      fileName   = "#{program.pages}-#{fileName}" if host is 'http://www.mangapark.com/' and program.pages
-      filePath   = "./#{folderPath}/#{fileName}"
+      folderPath  = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
+      folderPath += "-#{program.pages}" if host is 'http://www.mangapark.com/' and program.pages
+      fileName    = "#{padding(i, 3)}.jpg"
+      filePath    = "./#{folderPath}/#{fileName}"
 
       createFolder(folderPath)
       request(uri: imgUri, timeout: 120 * 1000)
@@ -84,12 +84,16 @@ mangaDownload = (vol, ep) ->
   paddedVol = padding(vol, 3)
   paddedEp  = padding(ep, 3)
   paddedEp += ".#{fraction}" if fraction
+  host      = mangaUrls[program.manga].url.match(/http:\/\/[.\w\d]+\//) || []
+  host      = host[0]
 
   if host is 'http://www.mangapark.com/'
     if program.pages
       uri += "10-#{program.pages}"
     else
       uri += 'all'
+
+  console.log uri
 
   request uri: uri, (err, res, body) ->
     if err or res.statusCode isnt 200
@@ -150,9 +154,11 @@ mangaList = ->
       request uri: "#{mangaUrls[name].url}/", followRedirect: false, (err, res, body) ->
         $          = cheerio.load(body)
         label      = switch host
-                     when 'http://mangafox.me/' then $('a.tips').first().text().trim()
-                     else                            $('div.detail_list span.left a.color_0077').first().text().trim()
-        labelNum   = ~~(_.last(label.split(' ')))
+                     when 'http://mangafox.me/'       then $('a.tips').first().text().trim()
+                     when 'http://www.mangapark.com/' then $('div.ch li.new span a b').first().text().trim().replace(/\n/, '').replace(/(\s+|\t)/, ' ')
+                     else                                  $('div.detail_list span.left a.color_0077').first().text().trim()
+        labelNum   = _.last(label.split(' '))
+        labelNum   = ~~(_.last(labelNum.split('.')))
         folderPath = "./manga/#{name}"
 
         if fs.existsSync(folderPath)
