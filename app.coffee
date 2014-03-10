@@ -148,12 +148,12 @@ mangaDownload = (vol, ep) ->
 mangaList = ->
   for name, url of mangaUrls
     do (name, url) ->
-      host = mangaUrls[name].url.match(/http:\/\/[.\w\d]+\//) || []
-      host = host[0]
+      _host = mangaUrls[name].url.match(/http:\/\/[.\w\d]+\//) || []
+      _host = _host[0]
 
       request uri: "#{mangaUrls[name].url}/", followRedirect: false, (err, res, body) ->
         $          = cheerio.load(body)
-        label      = switch host
+        label      = switch _host
                      when 'http://mangafox.me/'       then $('a.tips').first().text().trim()
                      when 'http://www.mangapark.com/' then $('div.ch li span a b').first().text().trim().replace(/\n/, '').replace(/(\s+|\t)/, ' ')
                      else                                  $('div.detail_list span.left a.color_0077').first().text().trim()
