@@ -155,7 +155,7 @@ mangaList = ->
         $          = cheerio.load(body)
         label      = switch host
                      when 'http://mangafox.me/'       then $('a.tips').first().text().trim()
-                     when 'http://www.mangapark.com/' then $('div.ch li.new span a b').first().text().trim().replace(/\n/, '').replace(/(\s+|\t)/, ' ')
+                     when 'http://www.mangapark.com/' then $('div.ch li span a b').first().text().trim().replace(/\n/, '').replace(/(\s+|\t)/, ' ')
                      else                                  $('div.detail_list span.left a.color_0077').first().text().trim()
         labelNum   = _.last(label.split(' '))
         labelNum   = ~~(_.last(labelNum.split('.')))
