@@ -1,8 +1,9 @@
 module.exports = do ->
+  'one_piece'      : url: 'http://mangafox.me/manga/one_piece', format: 1
   'bleach'         : url: 'http://mangafox.me/manga/bleach', format: 1
   'bleach_mp'      : url: 'http://www.mangapark.com/manga/Bleach', format: 4
-  'one_piece'      : url: 'http://mangafox.me/manga/one_piece', format: 1
-  'naruto'         : url: 'http://mangafox.me/manga/naruto', format: 1
+  'lucky_star'     : url: 'http://www.mangapark.com/manga/Lucky-Star', format: 4
+  'naruto'         : url: 'http://www.mangapark.com/manga/Naruto', format: 4
   'sk'             : url: 'http://www.mangahere.com/manga/shaman_king', format: 2
   'sk_f'           : url: 'http://www.mangahere.com/manga/shaman_king_flowers'
   'nisekoi'        : url: 'http://www.mangahere.com/manga/nisekoi_komi_naoshi'
@@ -27,4 +28,5 @@ module.exports = do ->
   'kancolle'       : url: 'http://www.mangahere.com/manga/kantai_collection_kancolle_itsuka_shizuka_na_umi_de'
   'kancolle_a'     : url: 'http://www.mangahere.com/manga/kantai_collection_comic_a_la_carte_maizuru_chinjufu_hen'
   'kancolle_fu'    : url: 'http://www.mangahere.com/manga/kantai_collection_kankore_4_koma_comic_fubuki_ganbarimasu'
+  'kancolle_shima' : url: 'http://www.mangapark.com/manga/kantai-collection-kankore-shimakaze-tsumujikaze-no-shoujo', format: 4
   'hentai_ouji'    : url: 'http://www.mangahere.com/manga/hentai_ouji_to_warawanai_neko'
