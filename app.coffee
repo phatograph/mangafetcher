@@ -151,11 +151,11 @@ mangaList = ->
       _host = mangaUrls[name].url.match(/http:\/\/[.\w\d]+\//) || []
       _host = _host[0]
 
-      request uri: "#{mangaUrls[name].url}/", followRedirect: false, (err, res, body) ->
+      request uri: "#{mangaUrls[name].url}/", followRedirect: true, (err, res, body) ->
         $          = cheerio.load(body)
         label      = switch _host
                      when 'http://mangafox.me/'       then $('a.tips').first().text().trim()
-                     when 'http://www.mangapark.com/' then $('div.ch li span a b').first().text().trim().replace(/\n/, '').replace(/(\s+|\t)/, ' ')
+                     when 'http://www.mangapark.com/' then $('ul.chapter li span a').first().text().trim().replace(/\n/, '').replace(/(\s+|\t)/, ' ')
                      else                                  $('div.detail_list span.left a.color_0077').first().text().trim()
         labelNum   = _.last(label.split(' '))
         labelNum   = ~~(_.last(labelNum.split('.')))
