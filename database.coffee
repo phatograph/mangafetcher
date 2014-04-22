@@ -36,6 +36,6 @@ module.exports = do ->
   'kancolle_akkg'      : url: 'http://mangapark.com/manga/kantai-collection-kancolle-akkg-doujinshi/s2', format: 2
   'kancolle_alacarte'  : url: 'http://mangapark.com/manga/kantai-collection-kancolle-comic-c3-a0-la-carte-maizuru-naval-district/s2', format: 2
   'kancolle_dairoku'   : url: 'http://mangapark.com/manga/kantai-collection-kancolle-dai-roku-kuchiku-tai-ha-zutto-nakayoshi-doujinshi/s2', format: 2
-  'kancolle_dostr'     : url: 'http://mangapark.com/manga/kantai-collection-kancolle-kancolle-dostraight-doujinshi/s2/v1/c0', format: 2
+  'kancolle_dostr'     : url: 'http://mangapark.com/manga/kantai-collection-kancolle-kancolle-dostraight-doujinshi/s2', format: 2
   'hentai_ouji'        : url: 'http://www.mangahere.com/manga/hentai_ouji_to_warawanai_neko'
   'twgok'              : url: 'http://mangapark.com/manga/the-world-god-only-knows/s3', format: 4

@@ -41,7 +41,7 @@ If the folder doesn't exist, it would be automatically created.
 - Trinity Seven
   - `mangafetcher -m trinity-seven -e 1`
 
-- And [many more](https://github.com/phatograph/mangafetcher/blob/master/manga.coffee)!
+- And [many more](https://github.com/phatograph/mangafetcher/blob/master/database.coffee)!
 
 ### Modes
 

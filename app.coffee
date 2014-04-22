@@ -9,7 +9,7 @@ exec      = require('child_process').exec
 moment    = require('moment')
 cheerio   = require('cheerio')
 clc       = require('cli-color')
-mangaUrls = require('./manga')
+mangaUrls = require('./database')
 
 program
   .version('0.0.1')
@@ -48,7 +48,7 @@ imageDownload = (imgUri, i, paddedVol, paddedEp, ep) ->
       return false
     if res2.headers['content-type'] is 'image/jpeg'
       folderPath  = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
-      folderPath += "-#{program.pages}" if host is 'http://www.mangapark.com/' and program.pages
+      folderPath += "-#{program.pages}" if host is 'http://mangapark.com/' and program.pages
       fileName    = "#{padding(i, 3)}.jpg"
       filePath    = "./#{folderPath}/#{fileName}"
 
@@ -87,7 +87,7 @@ mangaDownload = (vol, ep) ->
   host      = mangaUrls[program.manga].url.match(/http:\/\/[.\w\d]+\//) || []
   host      = host[0]
 
-  if host is 'http://www.mangapark.com/'
+  if host is 'http://mangapark.com/'
     if program.pages
       uri += "10-#{program.pages}"
     else
@@ -103,7 +103,7 @@ mangaDownload = (vol, ep) ->
     $ = cheerio.load(body)
 
     # Tap-in for mangapark.com
-    if host is 'http://www.mangapark.com/'
+    if host is 'http://mangapark.com/'
       imgs           = $('img.img')
       pages[ep]      = imgs.map (i) -> i
       pageAmount[ep] = pages[ep].length
@@ -154,9 +154,9 @@ mangaList = ->
       request uri: "#{mangaUrls[name].url}/", followRedirect: true, (err, res, body) ->
         $          = cheerio.load(body)
         label      = switch _host
-                     when 'http://mangafox.me/'       then $('a.tips').first().text().trim()
-                     when 'http://www.mangapark.com/' then $('ul.chapter li span a').first().text().trim().replace(/\n/, '').replace(/(\s+|\t)/, ' ')
-                     else                                  $('div.detail_list span.left a.color_0077').first().text().trim()
+                     when 'http://mangafox.me/'   then $('a.tips').first().text().trim()
+                     when 'http://mangapark.com/' then $('.stream:last-child ul.chapter li span a').first().text().trim().replace(/\n/, '').replace(/(\s+|\t)/, ' ')
+                     else                              $('div.detail_list span.left a.color_0077').first().text().trim()
         labelNum   = _.last(label.split(' '))
         labelNum   = ~~(_.last(labelNum.split('.')))
         folderPath = "./manga/#{name}"
@@ -167,7 +167,7 @@ mangaList = ->
             latestFolder = ~~(_.last(_.last(folders).split('-'))) if folders.length
             color = if latestFolder is labelNum then clc.green else clc.red
 
-            console.log "#{label} [#{clc.yellow name}] (local: #{color(latestFolder || '-')}/#{labelNum})"
+            console.log "#{label} [#{clc.yellow name}] (local: #{color(if latestFolder? then latestFolder else '-')}/#{labelNum})"
 
 episodeList = ->
   unless program.manga
