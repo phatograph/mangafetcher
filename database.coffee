@@ -39,3 +39,4 @@ module.exports = do ->
   'kancolle_dostr'     : url: 'http://mangapark.com/manga/kantai-collection-kancolle-kancolle-dostraight-doujinshi/s2', format: 2
   'hentai_ouji'        : url: 'http://www.mangahere.com/manga/hentai_ouji_to_warawanai_neko'
   'twgok'              : url: 'http://mangapark.com/manga/the-world-god-only-knows/s3', format: 4
+  'akuma_no_riddle'    : url: 'http://mangapark.com/manga/akuma-no-riddle/s2', format: 2

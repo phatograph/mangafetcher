@@ -21,6 +21,7 @@ program
   .option('-l, --list', 'List mode')
   .option('-x, --eplist', 'Episode List mode')
   .option('-r, --rerender <value>', 'Rerender mode (for mangahere)')
+  .option('-w, --ver <value>', 'Specify version')
   .parse(process.argv)
 
 ##############################################################################
@@ -47,7 +48,8 @@ imageDownload = (imgUri, i, paddedVol, paddedEp, ep) ->
       console.log clc.red "Oops, something went wrong. Error: #{err2}"
       return false
     if res2.headers['content-type'] is 'image/jpeg'
-      folderPath  = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
+      # Some manga has new episodes' volumn pending, consider if volumn is really needed for folder name
+      folderPath  = "manga/#{program.manga}/#{program.manga}-000-#{paddedEp}"
       folderPath += "-#{program.pages}" if host is 'http://mangapark.com/' and program.pages
       fileName    = "#{padding(i, 3)}.jpg"
       filePath    = "./#{folderPath}/#{fileName}"
@@ -75,12 +77,15 @@ imageDownload = (imgUri, i, paddedVol, paddedEp, ep) ->
 mangaDownload = (vol, ep) ->
   fraction  = if ep.match /\./ then _.last(ep.split('.')) else false
   ep        = ep.split('.')[0]
-  uri       = switch mangaUrls[program.manga].format
+  format    = mangaUrls[program.manga].format
+  format    = 4 if format is 2 and not vol
+  uri       = switch format
               when 1 then "#{mangaUrls[program.manga].url}/v#{if vol is 'TBD' then 'TBD' else padding(vol, 2)}/c#{padding(ep, 3)}/"
               when 2 then "#{mangaUrls[program.manga].url}/v#{vol}/c#{ep}/"
               when 3 then "#{mangaUrls[program.manga].url}/v#{padding(vol, 2)}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}/"
               when 4 then "#{mangaUrls[program.manga].url}/c#{ep}/"
               else        "#{mangaUrls[program.manga].url}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}/"
+  uri      += "e#{program.ver}/" if program.ver
   paddedVol = padding(vol, 3)
   paddedEp  = padding(ep, 3)
   paddedEp += ".#{fraction}" if fraction
@@ -167,7 +172,7 @@ mangaList = ->
             latestFolder = ~~(_.last(_.last(folders).split('-'))) if folders.length
             color = if latestFolder is labelNum then clc.green else clc.red
 
-            console.log "#{label} [#{clc.yellow name}] (local: #{color(if latestFolder? then latestFolder else '-')}/#{labelNum})"
+            console.log "[#{clc.yellow name}] #{label} (local: #{color(if latestFolder? then latestFolder else '-')}/#{labelNum})"
 
 episodeList = ->
   unless program.manga
