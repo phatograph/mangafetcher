@@ -48,8 +48,7 @@ imageDownload = (imgUri, i, paddedVol, paddedEp, ep) ->
       console.log clc.red "Oops, something went wrong. Error: #{err2}"
       return false
     if res2.headers['content-type'] is 'image/jpeg'
-      # Some manga has new episodes' volumn pending, consider if volumn is really needed for folder name
-      folderPath  = "manga/#{program.manga}/#{program.manga}-000-#{paddedEp}"
+      folderPath  = "manga/#{program.manga}/#{program.manga}-#{paddedVol}-#{paddedEp}"
       folderPath += "-#{program.pages}" if host is 'http://mangapark.com/' and program.pages
       fileName    = "#{padding(i, 3)}.jpg"
       filePath    = "./#{folderPath}/#{fileName}"

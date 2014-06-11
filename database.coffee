@@ -29,7 +29,7 @@ module.exports = do ->
   'kancolle'             : url: 'http://mangapark.com/manga/kantai-collection-kancolle-itsuka-shizuka-na-umi-de/s2', format: 2
   'kancolle_fu'          : url: 'http://mangapark.com/manga/kantai-collection-kancolle-4-koma-comic-fubuki-ganbarimasu/s2', format: 2
   'kancolle_shima'       : url: 'http://mangapark.com/manga/kantai-collection-kankore-shimakaze-tsumujikaze-no-shoujo', format: 4
-  'kancolle_waha'        : url: 'http://mangapark.com/manga/kantai-collection-kancolle-kankore-e2-98-86-waha-doujinshi/s2', format: 2
+  'kancolle_waha'        : url: 'http://mangapark.com/manga/kantai-collection-kancolle-kancolle-e2-98-86-waha-doujinshi/s2', format: 2
   'kancolle_nyagato'     : url: 'http://mangapark.com/manga/kantai-collection-kancolle-nora-senkan-nyagato-san-doujinshi/s2', format: 2
   'kancolle_nagatsuki'   : url: 'http://mangapark.com/manga/kantai-collection-kancolle-secretary-fleet-girl-nagatsuki-chan-doujinshi/s2', format: 4
   'kancolle_haruna'      : url: 'http://mangapark.com/manga/kantai-collection-kancolle-yes-even-if-shes-little-haruna-is-alright-doujinshi/s2', format: 2
@@ -39,6 +39,8 @@ module.exports = do ->
   'kancolle_dostr'       : url: 'http://mangapark.com/manga/kantai-collection-kancolle-kancolle-dostraight-doujinshi/s2', format: 2
   'kancolle_anthology'   : url: 'http://mangapark.com/manga/kantai-collection-kancolle-anthology-comic-yokosuka-guardian-office-edition/s2', format: 2
   'kancolle_kokuritsu'   : url: 'http://mangapark.com/manga/kantai-collection-kancolle-kokuritsu-kantai-youchien-doujinshi/s2', format: 2
+  'kancolle_kongou'      : url: 'http://mangapark.com/manga/kantai-collection-kancolle-kongou-desu-ga-chinjufu-no-kuuki-ga-burning-love-desu-doujinshi/s2', format: 2
+  'kancolle_bocchi'      : url: 'http://mangapark.com/manga/kantai-collection-kancolle-watashi-ga-bocchi-nano-wa-chinjufu-no-mina-san-no-okage-doujinshi/s2', format: 2
   'twgok'                : url: 'http://mangapark.com/manga/the-world-god-only-knows/s3', format: 4
   'akuma_no_riddle'      : url: 'http://mangapark.com/manga/akuma-no-riddle/s2', format: 2
   'amagi_brilliant_park' : url: 'http://mangapark.com/manga/amagi-brilliant-park-gatou-shouji/s1', format: 2
