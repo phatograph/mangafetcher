@@ -42,6 +42,8 @@ module.exports = do ->
   'kancolle_kongou'      : url: 'http://mangapark.com/manga/kantai-collection-kancolle-kongou-desu-ga-chinjufu-no-kuuki-ga-burning-love-desu-doujinshi/s2', format: 2
   'kancolle_bocchi'      : url: 'http://mangapark.com/manga/kantai-collection-kancolle-watashi-ga-bocchi-nano-wa-chinjufu-no-mina-san-no-okage-doujinshi/s2', format: 2
   'twgok'                : url: 'http://mangapark.com/manga/the-world-god-only-knows/s3', format: 4
-  'akuma_no_riddle'      : url: 'http://mangapark.com/manga/akuma-no-riddle/s2', format: 2
+  'akuma_no_riddle'      : url: 'http://mangapark.com/manga/akuma-no-riddle-kouga-yun/s3', format: 2
   'amagi_brilliant_park' : url: 'http://mangapark.com/manga/amagi-brilliant-park-gatou-shouji/s1', format: 2
   'baka_to_test'         : url: 'http://mangapark.com/manga/baka-to-test-to-shoukanjuu-inoue-kenji/s2', format: 2
+  'd_gray_man'           : url: 'http://mangapark.com/manga/d-gray-man/s3', format: 2
+  'jormungand'           : url: 'http://mangapark.com/manga/jormungand/s2', format: 2
