@@ -91,4 +91,4 @@ $ mangefetcher -m eyeshield21 -e 201..210
 ```
 
 
-All manga credits to [mangahere.com](http://mangahere.com) and [mangafox.me](http://mangafox.me)!
+All manga credits to [mangapark.com](http://mangapark.com), [mangahere.com](http://mangahere.com) and [mangafox.me](http://mangafox.me)!

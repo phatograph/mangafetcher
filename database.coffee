@@ -1,23 +1,4 @@
 module.exports = do ->
-  # 'sk'                   : url: 'http://www.mangahere.com/manga/shaman_king', format: 2
-  # 'sk_f'                 : url: 'http://www.mangahere.com/manga/shaman_king_flowers'
-  # 'denpa_kyoushi'        : url: 'http://www.mangahere.com/manga/denpa_kyoushi'
-  # 'trinity_seven'        : url: 'http://www.mangahere.com/manga/trinity_seven'
-  # 'to_love_ru_d'         : url: 'http://www.mangahere.com/manga/to_love_ru_darkness'
-  # 'shokugeki'            : url: 'http://www.mangahere.com/manga/shokugeki_no_soma'
-  # 'shinmai'              : url: 'http://www.mangahere.com/manga/shinmai_maou_no_keiyakusha'
-  # 'masamune'             : url: 'http://www.mangahere.com/manga/masamune_kun_no_revenge'
-  # 'eyeshield21'          : url: 'http://www.mangahere.com/manga/eyeshield_21'
-  # 'gundam_origin'        : url: 'http://www.mangahere.com/manga/mobile_suit_gundam_the_origin', format: 3
-  # 'fate_extra'           : url: 'http://www.mangahere.com/manga/fate_extra'
-  # 'mahoromatic_1'        : url: 'http://www.mangahere.com/manga/mahoromatic'
-  # 'mahoromatic_2'        : url: 'http://www.mangahere.com/manga/mahoromatic', format: 3
-  # 'tsubasa'              : url: 'http://www.mangahere.com/manga/captain_tsubasa', format: 3
-  # 'pot'                  : url: 'http://www.mangahere.com/manga/prince_of_tennis'
-  # 'yugi'                 : url: 'http://www.mangahere.com/manga/yu_gi_oh', format: 1
-  # 'yugi_d'               : url: 'http://www.mangahere.com/manga/yu_gi_oh_duelist', format: 1
-  # 'hentai_ouji'          : url: 'http://www.mangahere.com/manga/hentai_ouji_to_warawanai_neko'
-  # 'ffxii'                : url: 'http://www.mangahere.com/manga/final_fantasy_xii', format: 1
   'one_piece'            : url: 'http://mangafox.me/manga/one_piece', format: 1
   'bleach'               : url: 'http://mangafox.me/manga/bleach', format: 1
   'bleach_mp'            : url: 'http://mangapark.com/manga/Bleach', format: 4
@@ -47,3 +28,6 @@ module.exports = do ->
   'baka_to_test'         : url: 'http://mangapark.com/manga/baka-to-test-to-shoukanjuu-inoue-kenji/s2', format: 2
   'd_gray_man'           : url: 'http://mangapark.com/manga/d-gray-man/s3', format: 2
   'jormungand'           : url: 'http://mangapark.com/manga/jormungand/s2', format: 2
+  'touhou_deep_red'      : url: 'http://mangapark.com/manga/touhou-deep-red-doujinshi/s2', format: 2
+  'touhou_eternal_meek'  : url: 'http://mangapark.com/manga/touhou-eternal-meek-doujinshi/s2', format: 2
+  'touhou_usagi'         : url: 'http://mangapark.com/manga/touhou-gatsu-no-usagi-doujinshi/s2', format: 2
