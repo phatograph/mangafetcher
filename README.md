@@ -67,17 +67,21 @@ would quickly display this information. For example this displays a
 list of Tsubasa episodes.
 
 ```
-$ mangafetcher -x -m tsubasa
-Captain Tsubasa 114 | Vol 37 | Nov 19, 2007
-Captain Tsubasa 113 | Vol 37 | Nov 19, 2007
-Captain Tsubasa 112 | Vol 37 | Nov 19, 2007
-Captain Tsubasa 111 | Vol 37 | Nov 19, 2007
-Captain Tsubasa 110 | Vol 37 | Nov 19, 2007
-Captain Tsubasa 109 | Vol 36 | Nov 19, 2007
-Captain Tsubasa 108 | Vol 36 | Nov 19, 2007
+$ mangafetcher -x -m touhou_silent
+Version 1
+vol.1 ch.21
+vol.1 ch.20
+vol.1 ch.19
+vol.1 ch.18
+vol.1 ch.17
 ...
 
-$ mf -m tsubasa -v 37 -e 114
+Version 2
+ch.21
+ch.20
+...
+
+$ mangafetcher -m touhou_silent -v 1 -e 17
 ```
 
 ##### Multiple episodes mode
