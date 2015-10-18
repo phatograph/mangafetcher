@@ -180,11 +180,11 @@ episodeList = ->
 
   request uri: "#{mangaUrls[program.manga].url}/", followRedirect: false, (err, res, body) ->
     $ = cheerio.load(body)
-    $('div.detail_list ul span.left').each (i, l) ->
-      text = @parent().text().trim()
-        .replace(/\r?\n|\r|\t/g, '')
-        .replace(/\s{2,}/g, ' | ')
-      console.log text
+    $('.stream').each ->
+      console.log @.find('h3').text()
+      @.find('ul.chapter span a').each ->
+        console.log @.text().trim()
+      console.log()
 
 ##############################################################################
 # App Kickoff!
