@@ -35,3 +35,6 @@ module.exports = do ->
   'dungeon'              : url: 'http://mangapark.me/manga/dungeon-ni-deai-o-motomeru-no-wa-machigatte-iru-darou-ka/s5', format: 4
   'arthur'               : url: 'http://mangapark.me/manga/kakusansei-million-arthur-gunjou-no-shugosha/s5', format: 4
   'touhou_silent'        : url: 'http://mangapark.me/manga/touhou-bougetsushou-silent-sinner-in-blue/s1', format: 2
+  'negima'               : url: 'http://mangapark.me/manga/mahou-sensei-negima/s3', format: 2
+  'neko'                 : url: 'http://mangapark.me/manga/nukoduke/s1', format: 2
+  'suzuka'               : url: 'http://mangapark.me/manga/suzuka/s1', format: 2

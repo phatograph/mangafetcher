@@ -75,7 +75,6 @@ imageDownload = (imgUri, i, paddedVol, paddedEp, ep) ->
 
 mangaDownload = (vol, ep) ->
   fraction  = if ep.match /\./ then _.last(ep.split('.')) else false
-  ep        = ep.split('.')[0]
   format    = mangaUrls[program.manga].format
   format    = 4 if format is 2 and not vol
   uri       = switch format
@@ -86,12 +85,12 @@ mangaDownload = (vol, ep) ->
               else        "#{mangaUrls[program.manga].url}/c#{padding(ep, 3)}#{if fraction then '.' + fraction else ''}/"
   uri      += "e#{program.ver}/" if program.ver
   paddedVol = padding(vol, 3)
-  paddedEp  = padding(ep, 3)
+  paddedEp  = padding(ep.split('.')[0], 3)
   paddedEp += ".#{fraction}" if fraction
   host      = mangaUrls[program.manga].url.match(/http:\/\/[.\w\d]+\//) || []
   host      = host[0]
 
-  if host is 'http://mangapark.com/'
+  if host.match(/mangapark/)
     if program.pages
       uri += "10-#{program.pages}"
     else
